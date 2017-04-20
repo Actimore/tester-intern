@@ -1,0 +1,14 @@
+{
+  "name": "tester-intern",
+  "version": "0.1.0",
+  "scripts": {
+    "tests": "./node_modules/nightwatch/bin/nightwatch",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "express": "^4.15.2",
+    "nightwatch": "^0.9.12",
+    "request": "^2.81.0"
+  }
+}
