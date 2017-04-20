@@ -34,7 +34,12 @@ var S4 = function () {
   ((1 + Math.random()) * 0x10000) || 0).toString(16).substring(0, 4);
 };
 var testerName = function(){
-  var res = process.env.bsbuild || "manualbsbuild" +S4()+S4()+S4()+S4();
+
+  var tn = process.env.IS_SERVER ?  'server' : 'local'
+  tn += process.env.IS_REAL ?  'Real' : 'Coding' 
+  tn += 'NonExpress' + "BsBuild" +S4()+S4()+S4()+S4();
+
+  var res = process.env.BS_BUILD || tn;
   return res;
 }();
 

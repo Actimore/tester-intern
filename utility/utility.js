@@ -14,7 +14,7 @@ var snapshotInIteration = function (fileName, browser, iteration){
 
 function testNamePrefix(){
 	
-  return 'BsBuild: ' + process.env.bsbuild +' --- ';
+  return '';
 }
 
 

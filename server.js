@@ -1,44 +1,79 @@
 var express = require("express");
 var app = express();
-var cfenv = require("cfenv");
-var bodyParser = require('body-parser')
 var exec = require('child_process').exec;
+var rest = require('./rest');
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
-app.use(bodyParser.json())
 var childs = {};
-var browserstackQueLimit = 1; //have one until buildbs prefix checked.
+var rerunOnFail = true;
+var rerunOnSuccess = true;
+var readyAfterDeploy = true;
+var limitRerunFailInARow = 20;
+var failedInARow = 0;
+
+var S4 = function () {
+  return (
+  ((1 + Math.random()) * 0x10000) || 0).toString(16).substring(0, 4);
+};
 
 function buildForNightwatchConfJs(){
-  process.env.bsbuild = "autobsbuild" +S4()+S4()+S4()+S4();
-  return process.env.bsbuild;
-}
+  var prefix = process.env.IS_SERVER ?  'server' : 'local'
 
-function deleteBrowserStackBuild(buildName){
+  prefix += process.env.IS_REAL ?  'Real' : 'Coding' 
 
+
+  process.env.BS_BUILD = prefix + "BsBuild" +S4()+S4()+S4()+S4();
+  return process.env.BS_BUILD;
 }
 
 function killCmd(pid){
     console.log('Will kill pid: ' +pid)
-    childs[pid].childObj.kill()
-    deleteBrowserStackBuild(childs[pid].bsBuildName);
-    delete childs[pid];
+    childs[pid].childObj.kill();
+    failedInARow = 0;
+    console.log('Will kill browserstack build after delay due to 90 sek time to cancel the test: ' +pid)
+    setTimeout(function(){
+      var cObj = childs[pid];
+      var name = cObj.bsBuildName;
+      rest.deleteBrowserStackBuild(name);
+      delete childs[pid];
+    }, 200000);
+    
+}
+
+function allowedToReload(){
+  return readyAfterDeploy && failedInARow <= limitRerunFailInARow;
 }
 
 function run(cmd){
   var bsBuildName = buildForNightwatchConfJs(); //needs to be set before ecec 
+  console.log('Build name: ' + bsBuildName);
+  console.log(cmd);
   var child = exec(cmd, function(error, stdout, stderr) {
+    delete childs[child.pid];
+    
     if (error) {
+      failedInARow ++;
       console.error(error);
+      if(rerunOnFail && allowedToReload()){
+        setTimeout(function(){
+          console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
+          run(cmd);
+        }, 0); 
+      }
       return;
     }
-    killCmd(child.pid);
+
+    failedInARow = 0;
     console.log(stdout);
     console.log(stderr);
+    
+    if(rerunOnSuccess && allowedToReload()){
+      setTimeout(function(){
+        console.log('Wiill rerun on success: ' + cmd);
+        run(cmd);
+      }, 0); 
+    }
   });
+
   childs[child.pid] = {
     'childObj': child, 
     'bsBuildName': bsBuildName
@@ -46,22 +81,26 @@ function run(cmd){
 }
 
 function validateStart(cmd, res){
-  if (Object.keys(childs).length <= browserstackQueLimit){
+  if (!readyAfterDeploy){
+    res.send('No test started. Not ready after deploy...');
+  }
+  else if (Object.keys(childs).length < 1){
     run(cmd);
     res.send('started test: ' + cmd);
   } else {
-    res.send('Not started test due to browserstack que limit.');
+    res.send('Not started test due to max 1 test limit.');
   }
 }
 
-app.get('/start-auto', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch";
+app.get('/ready-after-deploy', function(req, res){
+  var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
+  
+  readyAfterDeploy = true;
   validateStart(cmd, res);
 });
 
-app.get('/start-all', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch";
-  validateStart(cmd, res);
+app.get('/ready-after-deploy-hold-tests', function(req, res){ 
+  readyAfterDeploy = true;
 });
 
 app.get('/convert-flow', function(req, res){
@@ -80,18 +119,22 @@ app.get('/reloadable-and-survives', function(req, res){
 });
 
 app.get('/kill', function(req, res){
-  var pids = Object.keys(childs);
-  pids.forEach(function(pid){
-    killCmd(pid);
-  });
+  readyAfterDeploy = false;
 
-  res.send('Killed all tests');
+  var pids = Object.keys(childs);
+  for (var i = 0; i < pids.length; i++) {
+    console.log('Will kill pid index ' + i)
+    
+    killCmd(pids[i]);
+  };
+    
+  res.send('Killed following tests ' + JSON.stringify(pids));
 });
 
 app.get('/status', function(req, res){
   var pids = Object.keys(childs);
   if(pids.length === 0){
-    res.send('No tests are running ');
+    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy);
   } else{
     res.send('Following tests with pid are running ' + JSON.stringify(pids));
   }
@@ -103,7 +146,7 @@ app.use(express.static(__dirname + '/views'));
 
 
 
-var port = process.env.PORT || 3001
+var port = process.env.PORT || 3008;
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
