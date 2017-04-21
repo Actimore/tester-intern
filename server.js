@@ -2,6 +2,8 @@ var express = require("express");
 var app = express();
 var exec = require('child_process').exec;
 var rest = require('./rest');
+var fs = require('fs');
+var StringDecoder = require('string_decoder').StringDecoder;
 
 var childs = {};
 var rerunOnFail = true;
@@ -9,6 +11,10 @@ var rerunOnSuccess = true;
 var readyAfterDeploy = true;
 var limitRerunFailInARow = 20;
 var failedInARow = 0;
+var decoder = new StringDecoder('utf8');
+
+
+process.title = 'testerInternApp';
 
 var S4 = function () {
   return (
@@ -53,6 +59,9 @@ function run(cmd){
     if (error) {
       failedInARow ++;
       console.error(error);
+      fs.writeFile(('./testLogs/error/' + bsBuildName + '.txt'), decoder.write(error), 'utf8', function (err) {
+        if (err) return console.log(err);
+      });
       if(rerunOnFail && allowedToReload()){
         setTimeout(function(){
           console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
@@ -65,6 +74,16 @@ function run(cmd){
     failedInARow = 0;
     console.log(stdout);
     console.log(stderr);
+    if(stdout){
+      fs.writeFile(('./testLogs/success/stdout/' + bsBuildName + '.txt'), decoder.write(stdout), 'utf8', function (err) {
+          if (err) return console.log(err);
+      });
+      if(stderr){
+        fs.writeFile(('./testLogs/success/stderr/' + bsBuildName + '.txt'), decoder.write(stderr), 'utf8', function (err) {
+            if (err) return console.log(err);
+        });   
+      }
+    }
     
     if(rerunOnSuccess && allowedToReload()){
       setTimeout(function(){
@@ -141,12 +160,11 @@ app.get('/status', function(req, res){
    
 });
 
-//serve static file (index.html, images, css)
-app.use(express.static(__dirname + '/views'));
+app.use(express.static('testLogs'));
 
 
 
-var port = process.env.PORT || 3008;
+var port = process.env.PORT || 3031;
 app.listen(port, function() {
     console.log("To view your app, open this link in your browser: http://localhost:" + port);
 });
