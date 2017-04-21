@@ -12,6 +12,7 @@ var readyAfterDeploy = true;
 var limitRerunFailInARow = 20;
 var failedInARow = 0;
 var decoder = new StringDecoder('utf8');
+var watingForRerun = false;
 
 
 process.title = 'testerInternApp';
@@ -46,7 +47,7 @@ function killCmd(pid){
 }
 
 function allowedToReload(){
-  return readyAfterDeploy && failedInARow <= limitRerunFailInARow;
+  return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow;
 }
 
 function run(cmd){
@@ -63,10 +64,12 @@ function run(cmd){
         if (err) return console.log(err);
       });
       if(rerunOnFail && allowedToReload()){
+        watingForRerun = true;
         setTimeout(function(){
+          watingForRerun = false;
           console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
           run(cmd);
-        }, 0); 
+        }, 120000); 
       }
       return;
     }
@@ -86,10 +89,12 @@ function run(cmd){
     }
     
     if(rerunOnSuccess && allowedToReload()){
+      watingForRerun = true;
       setTimeout(function(){
+        watingForRerun = false;
         console.log('Wiill rerun on success: ' + cmd);
         run(cmd);
-      }, 0); 
+      }, 120000); 
     }
   });
 
@@ -102,6 +107,9 @@ function run(cmd){
 function validateStart(cmd, res){
   if (!readyAfterDeploy){
     res.send('No test started. Not ready after deploy...');
+  }
+  else if (watingForRerun){
+    res.send('No test started. Not ready due to waiting for rerun attampt on previsous test...');
   }
   else if (Object.keys(childs).length < 1){
     run(cmd);
@@ -153,9 +161,9 @@ app.get('/kill', function(req, res){
 app.get('/status', function(req, res){
   var pids = Object.keys(childs);
   if(pids.length === 0){
-    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy);
+    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow);
   } else{
-    res.send('Following tests with pid are running ' + JSON.stringify(pids));
+    res.send('Following tests with pid are running ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow);
   }
    
 });

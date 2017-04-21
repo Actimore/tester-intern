@@ -1,5 +1,9 @@
 # tester-intern
 
+#globals
+use IS_REAL true if you want run tests for real and care about bugs
+ue IS_SERVER if running from blumix so we know ere logs are
+
 # Run tests via express
 npm start
 see server.js for available urls that start tests.
@@ -26,3 +30,7 @@ cf login -u patric.a.ogren@gmail.com -o actiMoreBlueMix -s actiMoreSpaceUK
 cf app push test-intern
 
 start the testes you want
+
+# working with tests and debugging
+https://test-intern-unsanded-megakaryoblast.eu-gb.mybluemix.net/success/stdout/serverRealBsBuild1ad81ae0153e14d6.txt
+http://demo.actimore.com/system/errorlog?tester=serverRealBsBuild1ad81ae0153e14d6&logLevel=ERROR
