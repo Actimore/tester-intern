@@ -18,8 +18,10 @@ https://console.ng.bluemix.net/docs/cli/reference/cfcommands/index.html#cf
 
 # Deploy blumix http://test-intern-unsanded-megakaryoblast.eu-gb.mybluemix.net/
 kill tests running properliy via url path: /kill .. and wait 300sek
+make sure you have bumped package.json version and commited it.
 make sure via ui that enviroment the following variables are true:  IS_REAL and IS_SERVER
 
+https://api.eu-gb.bluemix.net
 cf login -u patric.a.ogren@gmail.com -o actiMoreBlueMix -s actiMoreSpaceUK
 cf app push test-intern
 
