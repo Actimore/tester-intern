@@ -98,7 +98,7 @@ var nightwatch_config = {
           'browser_version': '56.0',
           'resolution': '1920x1080', 
           'browserstack.debug': commonCapabilities.bsDebug,
-          'project': 'actimoreBeta', 
+          'project': 'actimoreBeta2', 
           'build': testerName
       }
     },
@@ -144,7 +144,7 @@ var nightwatch_config = {
           'browser_version': '56.0',
           'resolution': '1024x1024', 
           'browserstack.debug': commonCapabilities.bsDebug,
-          'project': 'actimoreBeta', 
+          'project': 'actimoreBeta2', 
           'build': testerName
       }
     }
