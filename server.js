@@ -50,52 +50,66 @@ function allowedToReload(){
   return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow;
 }
 
+function logs(error, stdout, stderr, bsBuildName){
+  if(error){
+    console.error(error);
+    fs.writeFile(('./testLogs/error/' + bsBuildName + '.txt'), decoder.write(error), 'utf8', function (err) {
+        if (err) return console.log(err);
+      });
+  }
+  if(stdout){
+    console.log(stdout);
+    fs.writeFile(('./testLogs/success/stdout/' + bsBuildName + '.txt'), decoder.write(stdout), 'utf8', function (err) {
+        if (err) return console.log(err);
+    });
+  }  
+  if(stderr){
+    console.log(stderr);
+
+    fs.writeFile(('./testLogs/success/stderr/' + bsBuildName + '.txt'), decoder.write(stderr), 'utf8', function (err) {
+        if (err) return console.log(err);
+    });   
+  }
+   
+}
+
+function runOnError(cmd){
+  failedInARow ++;
+  if(rerunOnFail && allowedToReload()){
+    watingForRerun = true;
+    setTimeout(function(){
+      watingForRerun = false;
+      console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
+      run(cmd);
+    }, 120000); 
+  }
+}
+
+function runOnSuccess(cmd){
+  failedInARow = 0;
+  if(rerunOnSuccess && allowedToReload()){
+    watingForRerun = true;
+    setTimeout(function(){
+      watingForRerun = false;
+      console.log('Wiill rerun on success: ' + cmd);
+      run(cmd);
+    }, 120000); 
+  }
+}
+
 function run(cmd){
   var bsBuildName = buildForNightwatchConfJs(); //needs to be set before ecec 
   console.log('Build name: ' + bsBuildName);
   console.log(cmd);
   var child = exec(cmd, function(error, stdout, stderr) {
-    delete childs[child.pid];
-    
+    delete childs[child.pid];    
+    logs(error, stdout, stderr, bsBuildName);
     if (error) {
-      failedInARow ++;
-      console.error(error);
-      fs.writeFile(('./testLogs/error/' + bsBuildName + '.txt'), decoder.write(error), 'utf8', function (err) {
-        if (err) return console.log(err);
-      });
-      if(rerunOnFail && allowedToReload()){
-        watingForRerun = true;
-        setTimeout(function(){
-          watingForRerun = false;
-          console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
-          run(cmd);
-        }, 120000); 
-      }
+      rest.markSessionsAsFailedByBuildName(bsBuildName, 'CMD_ERROR')
+      runOnError(cmd);
       return;
     }
-
-    failedInARow = 0;
-    console.log(stdout);
-    console.log(stderr);
-    if(stdout){
-      fs.writeFile(('./testLogs/success/stdout/' + bsBuildName + '.txt'), decoder.write(stdout), 'utf8', function (err) {
-          if (err) return console.log(err);
-      });
-      if(stderr){
-        fs.writeFile(('./testLogs/success/stderr/' + bsBuildName + '.txt'), decoder.write(stderr), 'utf8', function (err) {
-            if (err) return console.log(err);
-        });   
-      }
-    }
-    
-    if(rerunOnSuccess && allowedToReload()){
-      watingForRerun = true;
-      setTimeout(function(){
-        watingForRerun = false;
-        console.log('Wiill rerun on success: ' + cmd);
-        run(cmd);
-      }, 120000); 
-    }
+    runOnSuccess(cmd); 
   });
 
   childs[child.pid] = {
