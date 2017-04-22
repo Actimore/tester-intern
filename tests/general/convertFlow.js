@@ -5,7 +5,7 @@ var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
   paymentUuidsToCancel=[],
-  amountOfDifferentTimeslotsToBuy = 40,
+  amountOfDifferentTimeslotsToBuy = 20,
   seedsMax = 1, 
   joinUrl;
 

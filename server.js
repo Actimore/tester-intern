@@ -147,7 +147,7 @@ app.get('/reloadable-and-survives', function(req, res){
 
 app.get('/kill', function(req, res){
   readyAfterDeploy = false;
-
+  failedInARow = 0;
   var pids = Object.keys(childs);
   for (var i = 0; i < pids.length; i++) {
     console.log('Will kill pid index ' + i)
