@@ -149,7 +149,7 @@ function navigateToBookableTimeslot(browser, iteration){
   
   utility.snapshotInIteration('convert-0.png', iteration);
   browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);
-  browser.click(".isTargetDetailedViewSelenium");
+  browser.click(".isTargetDetailedViewSelenium .overviewPrice");
 }
 
 

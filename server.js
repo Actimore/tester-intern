@@ -14,7 +14,7 @@ var failedInARow = 0;
 var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
-var testsSuccesSinceLastDeploy = 0;
+var testsSuccessSinceLastDeploy = 0;
 
 
 process.title = 'testerInternApp';
