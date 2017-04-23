@@ -57,7 +57,7 @@ function navigateToBookableTimeslot(browser, iteration){
   function tryToFindBookableTimeslot(){
     browser.execute(function (seedIndexInside, seedsMaxInside, dateAttemptsInside) {
       
-        var bookableSelector = '.timeSlotWrapper .overviewTicketsButton.isCanceled-false:not(.participantsNr-0)';
+        var bookableSelector = '.timeSlotOverview.isCanceled-false:not(.participantsNr-0)';
         var seedBtnSelector = '.actionItems button';
         var scrolled = false;
         var triedToScroll = false;
@@ -140,10 +140,13 @@ function navigateToBookableTimeslot(browser, iteration){
   tryToFindBookableTimeslot();
   
   browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);      
+  browser.pause(15000);    
   browser.execute(function () {
      jQuery(window).scrollTop(jQuery('.isTargetDetailedViewSelenium').eq(1).offset().top - (jQuery(window).height()));
   }, []);
   browser.pause(browser.globals.generalScrollTime);
+  browser.pause(25000);    
+  
   utility.snapshotInIteration('convert-0.png', iteration);
   browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);
   browser.click(".isTargetDetailedViewSelenium");
@@ -164,13 +167,18 @@ function buy(browser, i, isJoinBooking){
     browser.expect.element('.userEmailWrapper input[type=email]').to.have.value.that.equals(userTestEmail);
     browser.click(".buyButton");
 
+    browser.waitForElementVisible('.guaranteeModalContent', browser.globals.generalWaitingTime);
+    utility.snapshotInIteration('gurantee-'+imageDifference+'.png', browser, i);
+    browser.click(".guaranteeModalContent .btn-primary");
+ 
+    
     browser.execute(function () {
          jQuery("iframe.stripe_checkout_app").attr("id", "stripe_checkout_id_for_selenium");
     }, []);
     browser.waitForElementVisible('#stripe_checkout_id_for_selenium', browser.globals.generalWaitingTime); //stripe pop up
     browser.frame('stripe_checkout_id_for_selenium');  
     browser.expect.element('.Checkout').to.be.present.before(browser.globals.generalWaitingTime);
-    utility.snapshotInIteration('convert-+imageDifference+8.png', browser, i);
+    utility.snapshotInIteration('convert-'+imageDifference+'8.png', browser, i);
     browser.execute(function () {
         document.querySelector("input[placeholder='Card number']").setAttribute("id", "stripe_selenium_card");
         document.querySelector("input[placeholder='MM / YY']").setAttribute("id", "stripe_selenium_date");
@@ -330,7 +338,7 @@ function addConvertFlowCase (i){
             console.log(joinUrl);
             console.log("Reload join booking");
         });
-      browser.url(joinUrl);
+      browser.url(joinUrl+"?tester=" +browser.globals.testerName);
 
       browser.pause(browser.globals.waitAfterNewUrlTime); 
       // browser.getTagName(".cc-dismiss", function(result) {
@@ -379,7 +387,17 @@ function addConvertFlowCase (i){
   
   };        
   testCases[utility.testNamePrefix() +'Join event, iteration: ' + i] = function (browser) {
-    browser.url(joinUrl);
+    browser
+      .url(joinUrl +"?tester=" +browser.globals.testerName)
+      .waitForElementVisible('.introModalContent', browser.globals.generalWaitingTime)
+      .click(".introModalContent .btn-primary")
+      .pause(browser.globals.domGenerationTime);
+    
+    browser.click(".introModalContent .btn-primary");
+    browser.click(".introModalContent .btn-primary");
+    browser.click(".introModalContent .btn-primary");
+    browser.waitForElementNotPresent('.introModalContent', browser.globals.generalWaitingTime);
+    
 
     browser.pause(browser.globals.waitAfterNewUrlTime); 
     // browser.getTagName(".cc-dismiss", function(result) {

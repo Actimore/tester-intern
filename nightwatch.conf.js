@@ -3,7 +3,7 @@ var commonSettings = {
   siteDomain: "https://demo.actimore.com",
   cookieDomain: "demo.actimore.com",
   generalWaitingTime: 20000, 
-  generalScrollTime: 1000, 
+  generalScrollTime: 5000, 
   survivesTime: 200,
   domGenerationTime: 3000,
   waitAfterNewUrlTime: 3000,

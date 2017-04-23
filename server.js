@@ -9,10 +9,12 @@ var childs = {};
 var rerunOnFail = true;
 var rerunOnSuccess = true;
 var readyAfterDeploy = true;
-var limitRerunFailInARow = 50;
+var limitRerunFailInARow = 20;
 var failedInARow = 0;
 var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
+var testsFailedSinceLastDeploy = 0;
+var testsSuccesSinceLastDeploy = 0;
 
 
 process.title = 'testerInternApp';
@@ -105,10 +107,12 @@ function run(cmd){
     delete childs[child.pid];    
     logs(error, stdout, stderr, bsBuildName);
     if (error) {
+      testsFailedSinceLastDeploy++;
       rest.markSessionsAsFailedByBuildName(bsBuildName, 'CMD_ERROR')
       runOnError(cmd);
       return;
     }
+    testsSuccessSinceLastDeploy++;
     runOnSuccess(cmd); 
   });
 
@@ -135,12 +139,15 @@ function validateStart(cmd, res){
 
 app.get('/ready-after-deploy', function(req, res){
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
-  
+  testsFailedSinceLastDeploy = 0;
+  testsSuccesSinceLastDeploy = 0;
   readyAfterDeploy = true;
   validateStart(cmd, res);
 });
 
 app.get('/ready-after-deploy-hold-tests', function(req, res){ 
+  testsFailedSinceLastDeploy = 0;
+  testsSuccesSinceLastDeploy = 0;
   readyAfterDeploy = true;
 });
 
@@ -161,6 +168,9 @@ app.get('/reloadable-and-survives', function(req, res){
 
 app.get('/kill', function(req, res){
   readyAfterDeploy = false;
+  testsFailedSinceLastDeploy = 0;
+  testsSuccesSinceLastDeploy = 0;
+
   failedInARow = 0;
   var pids = Object.keys(childs);
   for (var i = 0; i < pids.length; i++) {
@@ -172,12 +182,24 @@ app.get('/kill', function(req, res){
   res.send('Killed following tests ' + JSON.stringify(pids));
 });
 
+app.get('/did-i-depoy-shitty-code', function(req, res){
+  if(testsFailedSinceLastDeploy === 0 && testsSuccessSinceLastDeploy === 0){
+    res.send('wait to know...and rerun qurey');
+  }
+  else if(testsFailedSinceLastDeploy === 0){
+    res.send('NO');
+  } else{
+    res.send('YES');
+  }
+   
+});
+
 app.get('/status', function(req, res){
   var pids = Object.keys(childs);
   if(pids.length === 0){
-    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow);
+    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   } else{
-    res.send('Following tests with pid are running ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow);
+    res.send('Following tests with pid are running ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   }
    
 });
