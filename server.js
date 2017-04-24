@@ -197,9 +197,9 @@ app.get('/did-i-depoy-shitty-code', function(req, res){
 app.get('/status', function(req, res){
   var pids = Object.keys(childs);
   if(pids.length === 0){
-    res.send('No tests are running and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+    res.send('No tests are running, and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   } else{
-    res.send('Following tests with pid are running ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+    res.send('Following tests with pid are running, ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   }
    
 });

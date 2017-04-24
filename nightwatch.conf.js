@@ -4,7 +4,7 @@ var commonSettings = {
   cookieDomain: "demo.actimore.com",
   generalWaitingTime: 20000, 
   generalScrollTime: 5000, 
-  survivesTime: 200,
+  survivesTime: 1800,
   domGenerationTime: 3000,
   waitAfterNewUrlTime: 3000,
   snapshotEnabled:  true, 
@@ -27,6 +27,8 @@ var commonCapabilities = {
   bsKey: 'WF3ChxyK2xss3TEQA7DR',
   bsDebug: true
 };
+
+var projectName = 'actimoreBeta4';
 
 
 var S4 = function () {
@@ -98,7 +100,7 @@ var nightwatch_config = {
           'browser_version': '56.0',
           'resolution': '1920x1080', 
           'browserstack.debug': commonCapabilities.bsDebug,
-          'project': 'actimoreBeta3', 
+          'project': projectName, 
           'build': testerName
       }
     },
@@ -144,7 +146,7 @@ var nightwatch_config = {
           'browser_version': '56.0',
           'resolution': '1024x1024', 
           'browserstack.debug': commonCapabilities.bsDebug,
-          'project': 'actimoreBeta3', 
+          'project': projectName, 
           'build': testerName
       }
     }
