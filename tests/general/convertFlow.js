@@ -5,7 +5,7 @@ var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
   paymentUuidsToCancel=[],
-  amountOfDifferentTimeslotsToBuy = 6,
+  amountOfDifferentTimeslotsToBuy = 30,
   seedsMax = 1, 
   joinUrl;
 
@@ -68,7 +68,7 @@ function navigateToBookableTimeslot(browser, iteration){
         var amountBookable  = jQuery(bookableSelector).length;
         var seedBtnExists = jQuery(seedBtnSelector).length ? true: false;
         if(amountBookable){
-          jQuery(bookableSelector).eq(1).addClass('isTargetDetailedViewSelenium');
+          jQuery(bookableSelector).eq(0).addClass('isTargetDetailedViewSelenium');
           return {addedClass: true, switchedSeed: false, scrolled: false, triedToScroll: false};
         } else{
           if(seedBtnExists && seedIndexInside <= seedsMaxInside){
@@ -139,17 +139,17 @@ function navigateToBookableTimeslot(browser, iteration){
   }
   tryToFindBookableTimeslot();
   
-  browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);      
+  browser.waitForElementVisible('.isTargetDetailedViewSelenium .timeSlotLayersBlock', browser.globals.generalWaitingTime);      
   browser.pause(15000);    
   browser.execute(function () {
-     jQuery(window).scrollTop(jQuery('.isTargetDetailedViewSelenium').eq(1).offset().top - (jQuery(window).height()));
+     jQuery(window).scrollTop(jQuery('.isTargetDetailedViewSelenium .timeSlotLayersBlock').eq(0).offset().top - (jQuery(window).height()));
   }, []);
   browser.pause(browser.globals.generalScrollTime);
   browser.pause(25000);    
   
   utility.snapshotInIteration('convert-0.png', iteration);
   browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);
-  browser.click(".isTargetDetailedViewSelenium .overviewPrice");
+  browser.click(".isTargetDetailedViewSelenium .timeSlotLayersBlock");
 }
 
 
@@ -191,8 +191,7 @@ function buy(browser, i, isJoinBooking){
     browser.setValue('#stripe_selenium_cvc', '333'); 
     browser.click("button[type=submit]");
     browser.frameParent();
-    browser.waitForElementVisible('.loadingPaymentSuccessfullTitle', browser.globals.generalWaitingTime)
-
+    browser.pause(3000);
     browser.waitForElementVisible('.bookingDetailsPaymentWrapper', browser.globals.generalWaitingTime); //wait for success
     browser.pause(3000);
     browser.url(function(result) {
