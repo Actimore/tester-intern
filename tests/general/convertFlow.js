@@ -1,6 +1,15 @@
 var request = require('request');
-var utility = require('../../utility/utility.js');
-var amApi = require('../../utility/amApi.js');
+var utility = require('../../utility/utility');
+var amApi = require('../../utility/amApi');
+var low = require('lowdb')
+
+var db = low('db.json')
+
+// Set some defaults if your JSON file is empty 
+db.defaults({ paymentUuidsToCancel: [] })
+  .write();
+
+
 
 var testCases = {},
   cacheWindowAdoption = false,
@@ -10,7 +19,7 @@ var testCases = {},
   joinUrl;
 
 if (typeof process.env.paymentUuidsToCancel === 'undefined') {
-  process.env.paymentUuidsToCancel = [];
+  process.env.paymentUuidsToCancel = JSON.stringify([]);
 }
 
 for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
@@ -193,7 +202,14 @@ function buy(browser, i, isJoinBooking){
       var found = urlWithPaymentUUid.match(/payment\/(.{36})/);
       var foundUuid = found[1];
       console.log(foundUuid);
-      process.env.paymentUuidsToCancel.push(foundUuid);
+      db.get('paymentUuidsToCancel')
+        .push(foundUuid)
+        .write();
+        var tmp = db.get('paymentUuidsToCancel').value();
+
+        console.log('after buy tmp from db');
+        console.log(tmp);
+
     });
     browser.pause(20000);
     
@@ -323,7 +339,7 @@ function addConvertFlowCase (i){
   };
   
   testCases[utility.testNamePrefix() +'Reload, survives and scroll trough join booking url, iteration: ' + i] = function (browser) {
-
+     
     for(var k = 1; k<=browser.globals.testSpecific.convertFlow.amountOfJoinBookingUrlReloads; k++){
       browser.perform(function() {
             console.log(joinUrl);

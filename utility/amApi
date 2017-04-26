@@ -1,3 +1,7 @@
+var low = require('lowdb')
+var sleep = require('sleep');
+var request = require('request');
+
 function cancelBookingCall(paymentReferenceUuid) {
   var url = 'https://demo.actimore.com/api/process/cancellation?apiVersion=1&lang=sv_SE&requestUuid=123&paymentReferenceUuid=' + paymentReferenceUuid;
   console.log(url);
@@ -11,15 +15,25 @@ function cancelBookingCall(paymentReferenceUuid) {
 
 }
 
-function cancelBookings () {
-  process.env.paymentUuidsToCancel.forEach(function(uuid){
-    browser.pause(20000);
-    browser.perform(function() {
+function cancelBookings () { 
+  var db = low('db.json')
+
+  //find all
+  var toCancel = db.get('paymentUuidsToCancel').value();
+
+  console.log('cancel from db');
+  console.log(toCancel);
+
+
+  toCancel.forEach(function(uuid){
       console.log("Will cancel booking with paymentUuid: " +uuid);
       cancelBookingCall(uuid);  
-    });
-    
+      sleep.msleep(20000);
   }); 
+
+  // Reset 
+  db.set('paymentUuidsToCancel', [])
+    .write()
 }
 
 module.exports  = {

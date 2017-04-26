@@ -28,7 +28,7 @@ var commonCapabilities = {
   bsDebug: true
 };
 
-var projectName = 'actimoreBeta4';
+var projectName = 'actimoreBeta5';
 
 
 var S4 = function () {

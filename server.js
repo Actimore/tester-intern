@@ -5,6 +5,8 @@ var rest = require('./rest');
 var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
 var amApi = require('./utility/amApi');
+var low = require('lowdb')
+
 
 var childs = {};
 var rerunOnFail = true;
@@ -16,10 +18,14 @@ var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
+var db = low('db.json')
 
-process.env.paymentUuidsToCancel = [];
+// Set some defaults if your JSON file is empty 
+db.defaults({ paymentUuidsToCancel: [] })
+  .write();
+ 
 
-
+ 
 process.title = 'testerInternApp';
 
 var S4 = function () {
