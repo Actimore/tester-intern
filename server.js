@@ -4,6 +4,7 @@ var exec = require('child_process').exec;
 var rest = require('./rest');
 var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
+var amApi = require('../../utility/amApi.js');
 
 var childs = {};
 var rerunOnFail = true;
@@ -15,6 +16,8 @@ var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
+
+proces.env.paymentUuidsToCancel = [];
 
 
 process.title = 'testerInternApp';
@@ -77,6 +80,7 @@ function logs(error, stdout, stderr, bsBuildName){
 
 function runOnError(cmd){
   failedInARow ++;
+  amApi.cancelBookings();
   if(rerunOnFail && allowedToReload()){
     watingForRerun = true;
     setTimeout(function(){
@@ -166,7 +170,7 @@ app.get('/reloadable-and-survives', function(req, res){
   validateStart(cmd, res);
 });
 
-app.get('/kill', function(req, res){
+app.get('/kill', function(req, res{
   readyAfterDeploy = false;
   testsFailedSinceLastDeploy = 0;
   testsSuccesSinceLastDeploy = 0;

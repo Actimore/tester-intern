@@ -1,32 +1,23 @@
 var request = require('request');
 var utility = require('../../utility/utility.js');
+var amApi = require('../../utility/amApi.js');
 
 var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
-  paymentUuidsToCancel=[],
   amountOfDifferentTimeslotsToBuy = 30,
   seedsMax = 1, 
   joinUrl;
 
+if (typeof proces.env.paymentUuidsToCancel === 'undefined') {
+  proces.env.paymentUuidsToCancel = [];
+}
 
 for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
  addConvertFlowCase(i);
 }
 
 
-function cancelBookingCall(paymentReferenceUuid) {
-  var url = 'https://demo.actimore.com/api/process/cancellation?apiVersion=1&lang=sv_SE&requestUuid=123&paymentReferenceUuid=' + paymentReferenceUuid;
-  console.log(url);
-  var payload = '';
-  request.put(url,
-      payload,
-      function (error, response, body) {
-        console.log(paymentReferenceUuid + ' has response status: '+ response.statusCode);
-      }
-  );
-
-}
 
 
 
@@ -201,7 +192,7 @@ function buy(browser, i, isJoinBooking){
       var found = urlWithPaymentUUid.match(/payment\/(.{36})/);
       var foundUuid = found[1];
       console.log(foundUuid);
-      paymentUuidsToCancel.push(foundUuid);
+      proces.env.paymentUuidsToCancel.push(foundUuid);
     });
     browser.pause(20000);
     
@@ -422,14 +413,7 @@ function addConvertFlowCase (i){
 }
 
 testCases[utility.testNamePrefix() +'Cancel all bookings'] = function (browser) {
-  paymentUuidsToCancel.forEach(function(uuid){
-    browser.pause(20000);
-    browser.perform(function() {
-      console.log("Will cancel booking with paymentUuid: " +uuid);
-      cancelBookingCall(uuid);  
-    });
-    
-  }); 
+  amApi.cancelBookings();  
 };
 
 

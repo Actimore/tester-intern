@@ -1,0 +1,23 @@
+function cancelBookingCall(paymentReferenceUuid) {
+  var url = 'https://demo.actimore.com/api/process/cancellation?apiVersion=1&lang=sv_SE&requestUuid=123&paymentReferenceUuid=' + paymentReferenceUuid;
+  console.log(url);
+  var payload = '';
+  request.put(url,
+      payload,
+      function (error, response, body) {
+        console.log(paymentReferenceUuid + ' has response status: '+ response.statusCode);
+      }
+  );
+
+}
+
+function cancelBookings () {
+  proces.env.paymentUuidsToCancel.forEach(function(uuid){
+    browser.pause(20000);
+    browser.perform(function() {
+      console.log("Will cancel booking with paymentUuid: " +uuid);
+      cancelBookingCall(uuid);  
+    });
+    
+  }); 
+}
