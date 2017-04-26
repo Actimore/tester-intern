@@ -12,7 +12,7 @@ function cancelBookingCall(paymentReferenceUuid) {
 }
 
 function cancelBookings () {
-  proces.env.paymentUuidsToCancel.forEach(function(uuid){
+  process.env.paymentUuidsToCancel.forEach(function(uuid){
     browser.pause(20000);
     browser.perform(function() {
       console.log("Will cancel booking with paymentUuid: " +uuid);
@@ -21,3 +21,7 @@ function cancelBookings () {
     
   }); 
 }
+
+module.exports  = {
+  cancelBookings: cancelBookings
+};

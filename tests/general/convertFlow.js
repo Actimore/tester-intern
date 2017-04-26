@@ -5,12 +5,12 @@ var amApi = require('../../utility/amApi.js');
 var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
-  amountOfDifferentTimeslotsToBuy = 30,
+  amountOfDifferentTimeslotsToBuy = 5,
   seedsMax = 1, 
   joinUrl;
 
-if (typeof proces.env.paymentUuidsToCancel === 'undefined') {
-  proces.env.paymentUuidsToCancel = [];
+if (typeof process.env.paymentUuidsToCancel === 'undefined') {
+  process.env.paymentUuidsToCancel = [];
 }
 
 for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
@@ -42,6 +42,7 @@ function navigateToBookableTimeslot(browser, iteration){
     browser.waitForElementVisible('.bd3-'+val+'-forSelenium', browser.globals.generalWaitingTime);
     browser.click('.bd3-'+val+'-forSelenium');
     browser.waitForElementNotVisible('#boxDropdown3', browser.globals.generalWaitingTime);
+    browser.pause(30000);
     browser.pause(browser.globals.survivesTime);
   }
   
@@ -192,7 +193,7 @@ function buy(browser, i, isJoinBooking){
       var found = urlWithPaymentUUid.match(/payment\/(.{36})/);
       var foundUuid = found[1];
       console.log(foundUuid);
-      proces.env.paymentUuidsToCancel.push(foundUuid);
+      process.env.paymentUuidsToCancel.push(foundUuid);
     });
     browser.pause(20000);
     

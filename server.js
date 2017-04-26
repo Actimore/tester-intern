@@ -4,7 +4,7 @@ var exec = require('child_process').exec;
 var rest = require('./rest');
 var fs = require('fs');
 var StringDecoder = require('string_decoder').StringDecoder;
-var amApi = require('../../utility/amApi.js');
+var amApi = require('./utility/amApi');
 
 var childs = {};
 var rerunOnFail = true;
@@ -17,7 +17,7 @@ var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
 
-proces.env.paymentUuidsToCancel = [];
+process.env.paymentUuidsToCancel = [];
 
 
 process.title = 'testerInternApp';
@@ -141,72 +141,72 @@ function validateStart(cmd, res){
   }
 }
 
-app.get('/ready-after-deploy', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
-  testsFailedSinceLastDeploy = 0;
-  testsSuccesSinceLastDeploy = 0;
-  readyAfterDeploy = true;
-  validateStart(cmd, res);
-});
+// app.get('/ready-after-deploy', function(req, res){
+//   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
+//   testsFailedSinceLastDeploy = 0;
+//   testsSuccesSinceLastDeploy = 0;
+//   readyAfterDeploy = true;
+//   validateStart(cmd, res);
+// });
 
-app.get('/ready-after-deploy-hold-tests', function(req, res){ 
-  testsFailedSinceLastDeploy = 0;
-  testsSuccesSinceLastDeploy = 0;
-  readyAfterDeploy = true;
-});
+// app.get('/ready-after-deploy-hold-tests', function(req, res){ 
+//   testsFailedSinceLastDeploy = 0;
+//   testsSuccesSinceLastDeploy = 0;
+//   readyAfterDeploy = true;
+// });
 
-app.get('/convert-flow', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
-  validateStart(cmd, res);
-});
+// app.get('/convert-flow', function(req, res){
+//   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
+//   validateStart(cmd, res);
+// });
 
-app.get('/reloadable-and-survives', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js";
-  validateStart(cmd, res);
-});
+// app.get('/reloadable-and-survives', function(req, res){
+//   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js";
+//   validateStart(cmd, res);
+// });
 
-app.get('/reloadable-and-survives', function(req, res){
-  var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/startPage.js";
-  validateStart(cmd, res);
-});
+// app.get('/reloadable-and-survives', function(req, res){
+//   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/startPage.js";
+//   validateStart(cmd, res);
+// });
 
-app.get('/kill', function(req, res{
-  readyAfterDeploy = false;
-  testsFailedSinceLastDeploy = 0;
-  testsSuccesSinceLastDeploy = 0;
+// app.get('/kill', function(req, res{
+//   readyAfterDeploy = false;
+//   testsFailedSinceLastDeploy = 0;
+//   testsSuccesSinceLastDeploy = 0;
 
-  failedInARow = 0;
-  var pids = Object.keys(childs);
-  for (var i = 0; i < pids.length; i++) {
-    console.log('Will kill pid index ' + i)
+//   failedInARow = 0;
+//   var pids = Object.keys(childs);
+//   for (var i = 0; i < pids.length; i++) {
+//     console.log('Will kill pid index ' + i)
     
-    killCmd(pids[i]);
-  };
+//     killCmd(pids[i]);
+//   };
     
-  res.send('Killed following tests ' + JSON.stringify(pids));
-});
+//   res.send('Killed following tests ' + JSON.stringify(pids));
+// });
 
-app.get('/did-i-depoy-shitty-code', function(req, res){
-  if(testsFailedSinceLastDeploy === 0 && testsSuccessSinceLastDeploy === 0){
-    res.send('wait to know...and rerun qurey');
-  }
-  else if(testsFailedSinceLastDeploy === 0){
-    res.send('NO');
-  } else{
-    res.send('YES');
-  }
-   
-});
+// app.get('/did-i-depoy-shitty-code', function(req, res){
+//   if(testsFailedSinceLastDeploy === 0 && testsSuccessSinceLastDeploy === 0){
+//     res.send('wait to know...and rerun qurey');
+//   }
+//   else if(testsFailedSinceLastDeploy === 0){
+//     res.send('NO');
+//   } else{
+//     res.send('YES');
+//   }
+//    
+// });
 
-app.get('/status', function(req, res){
-  var pids = Object.keys(childs);
-  if(pids.length === 0){
-    res.send('No tests are running, and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
-  } else{
-    res.send('Following tests with pid are running, ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
-  }
-   
-});
+// app.get('/status', function(req, res){
+//   var pids = Object.keys(childs);
+//   if(pids.length === 0){
+//     res.send('No tests are running, and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+//   } else{
+//     res.send('Following tests with pid are running, ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+//   }
+//    
+// });
 
 app.use(express.static('testLogs'));
 
