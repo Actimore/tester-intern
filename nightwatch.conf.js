@@ -71,8 +71,8 @@ var nightwatch_config = {
           snapshotEnabled: commonSettings.snapshotEnabled, 
           testSpecific: {
             convertFlow: {
-              amountOfDealUrlreloads: commonSettings.testSpecific.amountOfDealUrlreloads,
-              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.amountOfJoinBookingUrlReloads,
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
             }, 
             startPage: {
               amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations
@@ -117,8 +117,8 @@ var nightwatch_config = {
           snapshotEnabled: commonSettings.snapshotEnabled, 
           testSpecific: {
             convertFlow: {
-              amountOfDealUrlreloads: commonSettings.testSpecific.amountOfDealUrlreloads,
-              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.amountOfJoinBookingUrlReloads,
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
             }, 
             startPage: {
               amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations

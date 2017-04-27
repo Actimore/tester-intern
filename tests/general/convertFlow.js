@@ -283,7 +283,8 @@ function addConvertFlowCase (i){
   };
 
   testCases[utility.testNamePrefix() +'Reload deal page and survives  , iteration: ' + i] = function (browser) {
-   
+    console.log('deal realoads');
+    console.log(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads);
     for(var j = 1; j<=browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads; j++){
       browser.perform(function() {
           console.log('Reload deal');
@@ -339,7 +340,8 @@ function addConvertFlowCase (i){
   };
   
   testCases[utility.testNamePrefix() +'Reload, survives and scroll trough join booking url, iteration: ' + i] = function (browser) {
-     
+    console.log('reloads join');
+    console.log(browser.globals.testSpecific.convertFlow.amountOfJoinBookingUrlReloads);
     for(var k = 1; k<=browser.globals.testSpecific.convertFlow.amountOfJoinBookingUrlReloads; k++){
       browser.perform(function() {
             console.log(joinUrl);
