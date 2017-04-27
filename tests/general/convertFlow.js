@@ -107,14 +107,14 @@ function navigateToBookableTimeslot(browser, iteration){
           browser.perform(function() {
             console.log("Will switch dates... ");
           });
-          if(browser.globals.screenLimits.gte768){
+          if(browser.globals.screenLimits.gte768 && dateAttempts <= 4){
             switchDatesGte768();    
           }
           dateAttempts++;
           
         }
 
-        if(dateAttempts <= 4 && browser.globals.screenLimits.gte768){
+        if(dateAttempts <= 5 && browser.globals.screenLimits.gte768){
           browser.perform(function() {
             console.log("Date attempts allow new attempt... " + 'it is ' +dateAttempts);
           });
@@ -140,7 +140,7 @@ function navigateToBookableTimeslot(browser, iteration){
   }
   tryToFindBookableTimeslot();
   
-  browser.waitForElementVisible('.isTargetDetailedViewSelenium .timeSlotLayersBlock', browser.globals.generalWaitingTime);      
+  browser.waitForElementVisible('.isTargetDetailedViewSelenium .timeSlotLayersBlock', 120000);      
   browser.pause(15000);    
   browser.execute(function () {
      jQuery(window).scrollTop(jQuery('.isTargetDetailedViewSelenium .timeSlotLayersBlock').eq(0).offset().top - (jQuery(window).height()));

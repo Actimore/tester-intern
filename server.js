@@ -12,13 +12,21 @@ var childs = {};
 var rerunOnFail = true;
 var rerunOnSuccess = true;
 var readyAfterDeploy = true;
-var limitRerunFailInARow = 20;
+var limitRerunFailInARow = 1000;
 var failedInARow = 0;
 var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
 var db = low('db.json')
+var alternateTests = [
+  "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js"
+];
+var alternateIndex = 0
+var doAlternate = true;
 
 // Set some defaults if your JSON file is empty 
 db.defaults({ paymentUuidsToCancel: [] })
@@ -27,6 +35,17 @@ db.defaults({ paymentUuidsToCancel: [] })
 
  
 process.title = 'testerInternApp';
+
+function getAlternateCmd(){
+  alternateIndex++;
+  if(alternateIndex >= alternateTests.length){
+    alternateIndex = 0;
+  }
+
+  var cmd = alternateTests[alternateIndex];
+
+  return cmd;
+}
 
 var S4 = function () {
   return (
@@ -88,6 +107,9 @@ function runOnError(cmd){
   failedInARow ++;
   amApi.cancelBookings();
   if(rerunOnFail && allowedToReload()){
+    if (doAlternate){
+      cmd = getAlternateCmd();
+    }
     watingForRerun = true;
     setTimeout(function(){
       watingForRerun = false;
@@ -100,6 +122,9 @@ function runOnError(cmd){
 function runOnSuccess(cmd){
   failedInARow = 0;
   if(rerunOnSuccess && allowedToReload()){
+    if (doAlternate){
+      cmd = getAlternateCmd();
+    }
     watingForRerun = true;
     setTimeout(function(){
       watingForRerun = false;
@@ -165,6 +190,19 @@ app.get('/convert-flow', function(req, res){
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
   validateStart(cmd, res);
 });
+app.get('/convert-flow/win_ie_11', function(req, res){
+  var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js";
+  validateStart(cmd, res);
+});
+app.get('/convert-flow/win_ff_52', function(req, res){
+  var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js";
+  validateStart(cmd, res);
+});
+app.get('/convert-flow/mac_safari_8', function(req, res){
+  var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js";
+  validateStart(cmd, res);
+});
+
 
 app.get('/reloadable-and-survives', function(req, res){
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js";

@@ -11,7 +11,7 @@ var commonSettings = {
   testSpecific: {
     convertFlow: {
       amountOfDealUrlreloads: 10,
-      amountOfJoinBookingUrlReloads: 100,
+      amountOfJoinBookingUrlReloads: 10,
     }, 
     startPage: {
       amountOfFilterIterations: 2
@@ -96,9 +96,147 @@ var nightwatch_config = {
           'browserstack.key': commonCapabilities.bsKey,
           'os': 'OS X',
           'os_version': 'Yosemite',
-          'browser': 'Chrome',
+          'browserName': 'Chrome',
           'browser_version': '56.0',
           'resolution': '1920x1080', 
+          'browserstack.debug': commonCapabilities.bsDebug,
+          'project': projectName, 
+          'build': testerName
+      }
+    },
+      mac_safari_8: {
+        src_folders : [ "tests/general", 'tests/gte768'],
+        "globals": {
+          siteDomain: commonSettings.siteDomain,
+          cookieDomain: commonSettings.cookieDomain,
+          generalWaitingTime: commonSettings.generalWaitingTime, 
+          generalScrollTime: commonSettings.generalScrollTime, 
+          survivesTime: commonSettings.survivesTime,
+          domGenerationTime: commonSettings.domGenerationTime,
+          waitAfterNewUrlTime: commonSettings.waitAfterNewUrlTime,
+          snapshotEnabled: commonSettings.snapshotEnabled, 
+          testSpecific: {
+            convertFlow: {
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
+            }, 
+            startPage: {
+              amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations
+            },
+            reloadableAndSurvives: {
+              amountOfReloadUrls: commonSettings.testSpecific.reloadableAndSurvives.amountOfReloadUrls
+            }
+          },
+          screenLimits: {
+            gte768: true, 
+            lt768: false
+          } , 
+          testerName: testerName,
+          win: {
+            width: 1800,
+            height: 1000
+          }, 
+      },
+      desiredCapabilities: {
+          'browserstack.user': commonCapabilities.bsUser,
+          'browserstack.key': commonCapabilities.bsKey,
+           'browserName' : 'Safari',
+           'browser_version' : '8.0',
+           'os' : 'OS X',
+           'os_version' : 'Yosemite',
+           'resolution' : '1920x1080',
+          'browserstack.debug': commonCapabilities.bsDebug,
+          'project': projectName, 
+          'build': testerName
+      }
+    },
+    win_ff_52: {
+        src_folders : [ "tests/general", 'tests/gte768'],
+        "globals": {
+          siteDomain: commonSettings.siteDomain,
+          cookieDomain: commonSettings.cookieDomain,
+          generalWaitingTime: commonSettings.generalWaitingTime, 
+          generalScrollTime: commonSettings.generalScrollTime, 
+          survivesTime: commonSettings.survivesTime,
+          domGenerationTime: commonSettings.domGenerationTime,
+          waitAfterNewUrlTime: commonSettings.waitAfterNewUrlTime,
+          snapshotEnabled: commonSettings.snapshotEnabled, 
+          testSpecific: {
+            convertFlow: {
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
+            }, 
+            startPage: {
+              amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations
+            },
+            reloadableAndSurvives: {
+              amountOfReloadUrls: commonSettings.testSpecific.reloadableAndSurvives.amountOfReloadUrls
+            }
+          },
+          screenLimits: {
+            gte768: true, 
+            lt768: false
+          } , 
+          testerName: testerName,
+          win: {
+            width: 1800,
+            height: 1000
+          }, 
+      },
+      desiredCapabilities: {
+          'browserstack.user': commonCapabilities.bsUser,
+          'browserstack.key': commonCapabilities.bsKey,
+           'browserName' : 'Firefox',
+           'browser_version' : '52.0',
+           'os' : 'Windows',
+           'os_version' : '10',
+           'resolution' : '1920x1080',
+          'browserstack.debug': commonCapabilities.bsDebug,
+          'project': projectName, 
+          'build': testerName
+      }
+    },
+      win_ie_11: {
+        src_folders : [ "tests/general", 'tests/gte768'],
+        "globals": {
+          siteDomain: commonSettings.siteDomain,
+          cookieDomain: commonSettings.cookieDomain,
+          generalWaitingTime: commonSettings.generalWaitingTime, 
+          generalScrollTime: commonSettings.generalScrollTime, 
+          survivesTime: commonSettings.survivesTime,
+          domGenerationTime: commonSettings.domGenerationTime,
+          waitAfterNewUrlTime: commonSettings.waitAfterNewUrlTime,
+          snapshotEnabled: commonSettings.snapshotEnabled, 
+          testSpecific: {
+            convertFlow: {
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
+            }, 
+            startPage: {
+              amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations
+            },
+            reloadableAndSurvives: {
+              amountOfReloadUrls: commonSettings.testSpecific.reloadableAndSurvives.amountOfReloadUrls
+            }
+          },
+          screenLimits: {
+            gte768: true, 
+            lt768: false
+          } , 
+          testerName: testerName,
+          win: {
+            width: 1800,
+            height: 1000
+          }, 
+      },
+      desiredCapabilities: {
+          'browserstack.user': commonCapabilities.bsUser,
+          'browserstack.key': commonCapabilities.bsKey,
+           'browserName' : 'IE',
+           'browser_version' : '11.0',
+           'os' : 'Windows',
+           'os_version' : '10',
+           'resolution' : '1920x1080',
           'browserstack.debug': commonCapabilities.bsDebug,
           'project': projectName, 
           'build': testerName
