@@ -4,14 +4,14 @@ var commonSettings = {
   cookieDomain: "demo.actimore.com",
   generalWaitingTime: 20000, 
   generalScrollTime: 5000, 
-  survivesTime: 1800,
+  survivesTime: 10000,
   domGenerationTime: 3000,
   waitAfterNewUrlTime: 3000,
   snapshotEnabled:  true, 
   testSpecific: {
     convertFlow: {
-      amountOfDealUrlreloads: 2,
-      amountOfJoinBookingUrlReloads: 2,
+      amountOfDealUrlreloads: 100,
+      amountOfJoinBookingUrlReloads: 100,
     }, 
     startPage: {
       amountOfFilterIterations: 2
@@ -28,7 +28,7 @@ var commonCapabilities = {
   bsDebug: true
 };
 
-var projectName = 'actimoreBeta5';
+var projectName = 'actimoreBeta6';
 
 
 var S4 = function () {
