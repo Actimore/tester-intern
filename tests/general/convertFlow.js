@@ -216,6 +216,17 @@ function buy(browser, i, isJoinBooking){
 
 }
 
+function doIntroModel(browser){
+    browser.waitForElementVisible('.introModalContent', browser.globals.generalWaitingTime);
+    browser.click(".introModalContent .btn-primary");
+    browser.pause(browser.globals.domGenerationTime);
+    browser.click(".introModalContent .btn-primary");
+    browser.click(".introModalContent .btn-primary");
+    browser.click(".introModalContent .btn-primary");
+    browser.waitForElementNotPresent('.introModalContent', browser.globals.generalWaitingTime);
+    
+}
+
 function addConvertFlowCase (i){
 
   testCases[utility.testNamePrefix() +'Go to start page, iteration: ' + i] = function (browser) {
@@ -229,16 +240,8 @@ function addConvertFlowCase (i){
 
     browser.resizeWindow(browser.globals.win.width, browser.globals.win.height);
 
-    browser
-      .url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName)
-      .waitForElementVisible('.introModalContent', browser.globals.generalWaitingTime)
-      .click(".introModalContent .btn-primary")
-      .pause(browser.globals.domGenerationTime);
-    
-    browser.click(".introModalContent .btn-primary");
-    browser.click(".introModalContent .btn-primary");
-    browser.click(".introModalContent .btn-primary");
-    browser.waitForElementNotPresent('.introModalContent', browser.globals.generalWaitingTime);
+    browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
+    doIntroModel(browser);
     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
     browser.click(".cc-dismiss");
     browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
@@ -306,6 +309,10 @@ function addConvertFlowCase (i){
   };
 
   testCases[utility.testNamePrefix() +'Buy ticket, and will scroll trough success page, iteration: ' + i] = function (browser) {
+    if(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads !== 0){
+      doIntroModel(browser);
+    }
+
     buy(browser,i, false);
     if(i  === 1){
         browser.saveScreenshot('convert-9.png');
@@ -359,6 +366,9 @@ function addConvertFlowCase (i){
       //   }
       // });
 
+      if(k === 1){
+        doIntroModel(browser);
+      }
       
       browser.waitForElementVisible(".joinBookingRockstarDetailed", browser.globals.generalWaitingTime);
       

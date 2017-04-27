@@ -10,7 +10,7 @@ var commonSettings = {
   snapshotEnabled:  true, 
   testSpecific: {
     convertFlow: {
-      amountOfDealUrlreloads: 100,
+      amountOfDealUrlreloads: 10,
       amountOfJoinBookingUrlReloads: 100,
     }, 
     startPage: {
