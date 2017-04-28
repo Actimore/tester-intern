@@ -150,6 +150,52 @@ var nightwatch_config = {
           'build': testerName
       }
     },
+    mac_safari_10: {
+        src_folders : [ "tests/general", 'tests/gte768'],
+        "globals": {
+          siteDomain: commonSettings.siteDomain,
+          cookieDomain: commonSettings.cookieDomain,
+          generalWaitingTime: commonSettings.generalWaitingTime, 
+          generalScrollTime: commonSettings.generalScrollTime, 
+          survivesTime: commonSettings.survivesTime,
+          domGenerationTime: commonSettings.domGenerationTime,
+          waitAfterNewUrlTime: commonSettings.waitAfterNewUrlTime,
+          snapshotEnabled: commonSettings.snapshotEnabled, 
+          testSpecific: {
+            convertFlow: {
+              amountOfDealUrlreloads: commonSettings.testSpecific.convertFlow.amountOfDealUrlreloads,
+              amountOfJoinBookingUrlReloads: commonSettings.testSpecific.convertFlow.amountOfJoinBookingUrlReloads,
+            }, 
+            startPage: {
+              amountOfFilterIterations: commonSettings.testSpecific.startPage.amountOfFilterIterations
+            },
+            reloadableAndSurvives: {
+              amountOfReloadUrls: commonSettings.testSpecific.reloadableAndSurvives.amountOfReloadUrls
+            }
+          },
+          screenLimits: {
+            gte768: true, 
+            lt768: false
+          } , 
+          testerName: testerName,
+          win: {
+            width: 1800,
+            height: 1000
+          }, 
+      },
+      desiredCapabilities: {
+          'browserstack.user': commonCapabilities.bsUser,
+          'browserstack.key': commonCapabilities.bsKey,
+          'browserName' : 'Safari',
+          'browser_version' : '10.0',
+          'os' : 'OS X',
+          'os_version' : 'Sierra',
+          'resolution' : '1920x1080',
+          'browserstack.debug': commonCapabilities.bsDebug,
+          'project': projectName, 
+          'build': testerName
+      }
+    },
     win_ff_52: {
         src_folders : [ "tests/general", 'tests/gte768'],
         "globals": {

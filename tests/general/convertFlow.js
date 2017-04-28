@@ -193,7 +193,7 @@ function buy(browser, i, isJoinBooking){
     browser.click("button[type=submit]");
     browser.frameParent();
     browser.pause(3000);
-    browser.waitForElementVisible('.bookingDetailsPaymentWrapper', browser.globals.generalWaitingTime); //wait for success
+    browser.waitForElementVisible('.bookingDetailsPayment', browser.globals.generalWaitingTime); //wait for success
     browser.pause(3000);
     browser.url(function(result) {
       console.log(result);
