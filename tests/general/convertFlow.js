@@ -32,7 +32,7 @@ for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
 
 function navigateToBookableTimeslot(browser, iteration){
   var seedIndex = 0;
-  var dateAttempts = 1;
+  var dateAttempts = 4;
 
   function prepareClickableBtnsGte768(){
     browser.execute(function () {
@@ -191,7 +191,7 @@ function buy(browser, i, isJoinBooking){
     browser.setValue('#stripe_selenium_date', '1024');
     browser.setValue('#stripe_selenium_cvc', '333'); 
     browser.click("button[type=submit]");
-    browser.frameParent();
+    browser.frame(null);
     browser.pause(3000);
     browser.waitForElementVisible('.bookingDetailsPayment', browser.globals.generalWaitingTime); //wait for success
     browser.pause(3000);
