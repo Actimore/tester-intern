@@ -1,5 +1,6 @@
 tests_output
 testLogs
+db.json
 
 # Logs
 logs
