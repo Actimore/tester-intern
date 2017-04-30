@@ -309,9 +309,9 @@ function addConvertFlowCase (i){
   };
 
   testCases[utility.testNamePrefix() +'Buy ticket, and will scroll trough success page, iteration: ' + i] = function (browser) {
-    if(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads !== 0){
+    /*if(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads !== 0){
       doIntroModel(browser);
-    }
+    }*/
 
     buy(browser,i, false);
     if(i  === 1){

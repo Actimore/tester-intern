@@ -4,7 +4,7 @@ var commonSettings = {
   cookieDomain: "demo.actimore.com",
   generalWaitingTime: 120000, 
   generalScrollTime: 5000, 
-  survivesTime: 50000,
+  survivesTime: 100,
   domGenerationTime: 3000,
   waitAfterNewUrlTime: 3000,
   snapshotEnabled:  true, 
