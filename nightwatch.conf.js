@@ -4,14 +4,14 @@ var commonSettings = {
   cookieDomain: "demo.actimore.com",
   generalWaitingTime: 120000, 
   generalScrollTime: 5000, 
-  survivesTime: 30000,
+  survivesTime: 20000,
   domGenerationTime: 3000,
   waitAfterNewUrlTime: 3000,
   snapshotEnabled:  true, 
   testSpecific: {
     convertFlow: {
-      amountOfDealUrlreloads: 10,
-      amountOfJoinBookingUrlReloads: 10,
+      amountOfDealUrlreloads: 2,
+      amountOfJoinBookingUrlReloads: 2,
     }, 
     startPage: {
       amountOfFilterIterations: 2
