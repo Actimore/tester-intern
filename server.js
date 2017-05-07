@@ -20,10 +20,14 @@ var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
 var db = low('db.json')
 var alternateTests = [
-  "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js",
-  "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js",
-  //"./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js",
-  "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js"
+  "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/reloadableAndSurvives.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/reloadableAndSurvives.js",
+  "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/reloadableAndSurvives.js" 
+   // "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js",
+   // "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js",
+   // "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js",
+   // "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js"
   //"./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_10' --test tests/general/convertFlow.js"
 ];
 var alternateIndex = 0
@@ -210,7 +214,7 @@ app.get('/reloadable-and-survives', function(req, res){
   validateStart(cmd, res);
 });
 
-app.get('/reloadable-and-survives', function(req, res){
+app.get('/start-page', function(req, res){
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/startPage.js";
   validateStart(cmd, res);
 });

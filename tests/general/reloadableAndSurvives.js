@@ -3,7 +3,9 @@ var utility = require('../../utility/utility.js');
 var urlPaths = [
   "/", 
   '/sv/about',
-  '/sv/contact'
+  '/sv/contact',
+  '/sv/deals-by-brand/stockholm/danderyds-gokart/danderyds-gokartbana', 
+  '/sv/deals-by-brand/stockholm/danderys-gokart'
 ];
 
 
