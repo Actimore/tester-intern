@@ -33,7 +33,7 @@ urlPaths.forEach(function(e, i, a){
         .url(browser.globals.siteDomain + e +"?tester=" +browser.globals.testerName)
         .waitForElementNotPresent('.bootstrap-wrapper .loader', browser.globals.generalWaitingTime);
 
-    utility.snapshot('res' + i + '.png');
+    utility.snapshot('res' + i + '.png', browser);
 
   };      
 });
