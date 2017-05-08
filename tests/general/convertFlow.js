@@ -407,15 +407,7 @@ function addConvertFlowCase (i){
   };        
   testCases[utility.testNamePrefix() +'Join event, iteration: ' + i] = function (browser) {
     browser
-      .url(joinUrl +"?tester=" +browser.globals.testerName)
-      .waitForElementVisible('.introModalContent', browser.globals.generalWaitingTime)
-      .click(".introModalContent .btn-primary")
-      .pause(browser.globals.domGenerationTime);
-    
-    browser.click(".introModalContent .btn-primary");
-    browser.click(".introModalContent .btn-primary");
-    browser.click(".introModalContent .btn-primary");
-    browser.waitForElementNotPresent('.introModalContent', browser.globals.generalWaitingTime);
+      .url(joinUrl +"?tester=" +browser.globals.testerName);
     
 
     browser.pause(browser.globals.waitAfterNewUrlTime); 
