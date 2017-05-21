@@ -366,9 +366,7 @@ function addConvertFlowCase (i){
       //   }
       // });
 
-      if(k === 1){
-        doIntroModel(browser);
-      }
+ 
       
       browser.waitForElementVisible(".joinBookingRockstarDetailed", browser.globals.generalWaitingTime);
       
