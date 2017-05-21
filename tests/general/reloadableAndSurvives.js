@@ -1,4 +1,4 @@
-eachvar utility = require('../../utility/utility');
+var utility = require('../../utility/utility');
 
 var urlPaths = [
   "/", 
