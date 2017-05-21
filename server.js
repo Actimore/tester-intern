@@ -20,11 +20,11 @@ var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
 var db = low('db.json')
 var alternateTests = [
-  // "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js",
+  "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js",
   // "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/reloadableAndSurvives.js",
   // "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/reloadableAndSurvives.js",
   // "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/reloadableAndSurvives.js" 
-  "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js"
+ // "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js"
   //  "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js",
   //  "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js",
   //  "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js"

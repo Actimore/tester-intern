@@ -1,11 +1,11 @@
-var utility = require('../../utility/utility');
+eachvar utility = require('../../utility/utility');
 
 var urlPaths = [
   "/", 
   '/sv/about',
   '/sv/contact',
   '/sv/deals-by-brand/stockholm/danderyds-gokart/danderyds-gokartbana', 
-  '/sv/deals-by-brand/stockholm/danderys-gokart'
+  '/sv/deals-by-brand/stockholm/danderyds-gokart'
 ];
 
 
