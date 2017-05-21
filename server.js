@@ -229,10 +229,12 @@ app.get('/start-page', function(req, res){
 app.get('/alternate/convert-flow', function(req, res){
   alternateTests = [];
   addAlternateConvertFlow();
+  res.send('ok');
 });
 app.get('/alternate/reloadable-and-survives', function(req, res){
   alternateTests = [];
   addAlternateReloadableAndSurvives();
+  res.send('ok');
 });
 
 app.get('/kill', function(req, res){
