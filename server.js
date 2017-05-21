@@ -19,17 +19,7 @@ var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
 var testsSuccessSinceLastDeploy = 0;
 var db = low('db.json')
-var alternateTests = [
-  "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js",
-  // "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/reloadableAndSurvives.js",
-  // "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/reloadableAndSurvives.js",
-  // "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/reloadableAndSurvives.js" 
- // "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js"
-  //  "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js",
-  //  "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js",
-  //  "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js"
-  // "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_10' --test tests/general/convertFlow.js"
-];
+var alternateTests = [];
 var alternateIndex = 0
 var doAlternate = true;
 
@@ -40,6 +30,23 @@ db.defaults({ paymentUuidsToCancel: [] })
 
  
 process.title = 'testerInternApp';
+
+function addAlternateReloadableAndSurvives(){
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/reloadableAndSurvives.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_10' --test tests/general/reloadableAndSurvives.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/reloadableAndSurvives.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/reloadableAndSurvives.js");
+}
+
+function addAlternateConvertFlow(){
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_10' --test tests/general/convertFlow.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js");
+  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js");
+}
+
 
 function getAlternateCmd(){
   alternateIndex++;
@@ -219,6 +226,15 @@ app.get('/start-page', function(req, res){
   validateStart(cmd, res);
 });
 
+app.get('/alternate/convert-flow', function(req, res){
+  alternateTests = [];
+  addAlternateConvertFlow();
+});
+app.get('/alternate/reloadable-and-survives', function(req, res){
+  alternateTests = [];
+  addAlternateReloadableAndSurvives();
+});
+
 app.get('/kill', function(req, res){
   readyAfterDeploy = false;
   testsFailedSinceLastDeploy = 0;
@@ -259,7 +275,7 @@ app.get('/status', function(req, res){
 
 app.use(express.static('testLogs'));
 
-
+addAlternateConvertFlow(); 
 
 var port = process.env.PORT || 3031;
 app.listen(port, function() {
