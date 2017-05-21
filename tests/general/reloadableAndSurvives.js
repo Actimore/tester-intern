@@ -53,7 +53,7 @@ urlPaths.forEach(function(e, i, a){
 
 urlPaths.forEach(function(e, i, a){
   testCases[(utility.testNamePrefix() +"Reload-"+ e)] = function (browser) {
-    for(var i = 1; i<=browser.globals.reloadableAndSurvives.amountOfReloadUrls; i++){
+    for(var i = 1; i<=browser.globals.testSpecific.reloadableAndSurvives.amountOfReloadUrls; i++){
       browser
         .perform(function() {
             console.log("Reload index: " +i);
