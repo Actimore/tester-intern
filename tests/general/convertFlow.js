@@ -5,7 +5,7 @@ var low = require('lowdb')
 
 var db = low('db.json')
 
-// Set some defaults if your JSON file is empty 
+// Set some defaults if your JSON file is empty
 db.defaults({ paymentUuidsToCancel: [] })
   .write();
 
@@ -15,7 +15,7 @@ var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
   amountOfDifferentTimeslotsToBuy = 5,
-  seedsMax = 1, 
+  seedsMax = 1,
   joinUrl;
 
 if (typeof process.env.paymentUuidsToCancel === 'undefined') {
@@ -32,40 +32,41 @@ for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
 
 function navigateToBookableTimeslot(browser, iteration){
   var seedIndex = 0;
-  var dateAttempts = 4;
+  var dateAttempts = 1;
 
   function prepareClickableBtnsGte768(){
     browser.execute(function () {
-      [7,8,9,10].forEach(function(val){
-          jQuery("#boxDropdown3 li:nth-of-type("+val+") a").addClass("bd3-"+val+"-forSelenium");
+      [1, 2, 3, 4, 5].forEach(function(val){
+          jQuery(".filterArea.areaWhen span:nth-of-type("+val+") a").addClass("bd3-"+val+"-forSelenium");
         });
     }, []);
-    [7,8,9,10].forEach(function(val){
+    [1, 2, 3, 4, 5].forEach(function(val){
         browser.waitForElementPresent('.bd3-'+val+'-forSelenium', browser.globals.generalWaitingTime);
     });
-  }   
+  }
 
   function switchDatesGte768(){
-    var val = dateAttempts + 6;
-    browser.click(".timeFilterBox button");
+
+    browser.click(".filterWhen");
+    prepareClickableBtnsGte768();
+    var val = dateAttempts;
     browser.waitForElementVisible('.bd3-'+val+'-forSelenium', browser.globals.generalWaitingTime);
     browser.click('.bd3-'+val+'-forSelenium');
-    browser.waitForElementNotVisible('#boxDropdown3', browser.globals.generalWaitingTime);
     browser.pause(30000);
     browser.pause(browser.globals.survivesTime);
   }
-  
+
   function tryToFindBookableTimeslot(){
     browser.execute(function (seedIndexInside, seedsMaxInside, dateAttemptsInside) {
-      
+
         var bookableSelector = '.timeSlotOverview.isCanceled-false:not(.participantsNr-0)';
         var seedBtnSelector = '.actionItems button';
         var scrolled = false;
         var triedToScroll = false;
         // if(dateAttemptsInside === 1){
-        //   jQuery(bookableSelector).remove(); //Simulates all booked while testing this algoritm         
+        //   jQuery(bookableSelector).remove(); //Simulates all booked while testing this algoritm
         // }
-        
+
         var amountBookable  = jQuery(bookableSelector).length;
         var seedBtnExists = jQuery(seedBtnSelector).length ? true: false;
         if(amountBookable){
@@ -81,7 +82,7 @@ function navigateToBookableTimeslot(browser, iteration){
               jQuery(window).scrollTop(jQuery('.timeSlotWrapper').eq(-1).offset().top + jQuery('.timeSlotWrapper').eq(-1).height());
               scrolled = true;
             }
-            
+
           }
           return {addedClass: false, switchedSeed: seedBtnExists, scrolled: scrolled, triedToScroll: triedToScroll};
         }
@@ -92,7 +93,7 @@ function navigateToBookableTimeslot(browser, iteration){
       if(result.value.switchedSeed){
         seedIndex++;
       }
-      
+
       if(!result.value.addedClass){
           browser.perform(function() {
             console.log("Did not add class");
@@ -107,11 +108,11 @@ function navigateToBookableTimeslot(browser, iteration){
           browser.perform(function() {
             console.log("Will switch dates... ");
           });
-          if(browser.globals.screenLimits.gte768 && dateAttempts <= 4){
-            switchDatesGte768();    
+          if(browser.globals.screenLimits.gte768 && dateAttempts <= 5){
+            switchDatesGte768();
           }
           dateAttempts++;
-          
+
         }
 
         if(dateAttempts <= 5 && browser.globals.screenLimits.gte768){
@@ -125,29 +126,27 @@ function navigateToBookableTimeslot(browser, iteration){
             console.log("Date attempts to many or lte768, will quit trying finding bookable timeslot... ");
           });
         }
-      
+
       } else {
           browser.perform(function() {
             console.log("Did add class");
           });
-      } 
+      }
     });
   }
 
 
-  if(browser.globals.screenLimits.gte768){
-   prepareClickableBtnsGte768();
-  }
+
   tryToFindBookableTimeslot();
-  
-  browser.waitForElementVisible('.isTargetDetailedViewSelenium .timeSlotLayersBlock', 120000);      
-  browser.pause(15000);    
+
+  browser.waitForElementVisible('.isTargetDetailedViewSelenium .timeSlotLayersBlock', 120000);
+  browser.pause(15000);
   browser.execute(function () {
      jQuery(window).scrollTop(jQuery('.isTargetDetailedViewSelenium .timeSlotLayersBlock').eq(0).offset().top - (jQuery(window).height()));
   }, []);
   browser.pause(browser.globals.generalScrollTime);
-  browser.pause(25000);    
-  
+  browser.pause(25000);
+
   utility.snapshotInIteration('convert-0.png', iteration);
   browser.waitForElementVisible('.isTargetDetailedViewSelenium', browser.globals.generalWaitingTime);
   browser.click(".isTargetDetailedViewSelenium .timeSlotLayersBlock");
@@ -158,7 +157,7 @@ function buy(browser, i, isJoinBooking){
   var imageDifference = isJoinBooking ? "join-": "";
   var userTestName = isJoinBooking ? "Patric Von Joinarsson": "Kristoffer Initialusersson";
   var userTestEmail = isJoinBooking ? "patric.ogren@hotmail.com": "krippa.hogberg@hotmail.com";
-  
+
     browser.execute(function () {
       jQuery(window).scrollTop(jQuery('.userEmailWrapper').offset().top - (jQuery(window).height() / 2));
     }, []);
@@ -166,18 +165,24 @@ function buy(browser, i, isJoinBooking){
     browser.setValue('input.userName', userTestName);
     browser.pause(browser.globals.generalScrollTime);
     browser.expect.element('.userEmailWrapper input[type=email]').to.have.value.that.equals(userTestEmail);
+    if (!isJoinBooking) {
+      browser.execute(function () {
+          $("select[name='timeSlot']").find("option[value='0']").prop('selected',true).trigger('change'); //trigger a change instead of click
+      }, []);
+      browser.pause(4000);
+    }  
     browser.click(".buyButton");
 
     browser.waitForElementVisible('.guaranteeModalContent', browser.globals.generalWaitingTime);
     utility.snapshotInIteration('gurantee-'+imageDifference+'.png', browser, i);
     browser.click(".guaranteeModalContent .btn-primary");
- 
-    
+
+
     browser.execute(function () {
          jQuery("iframe.stripe_checkout_app").attr("id", "stripe_checkout_id_for_selenium");
     }, []);
     browser.waitForElementVisible('#stripe_checkout_id_for_selenium', browser.globals.generalWaitingTime); //stripe pop up
-    browser.frame('stripe_checkout_id_for_selenium');  
+    browser.frame('stripe_checkout_id_for_selenium');
     browser.expect.element('.Checkout').to.be.present.before(browser.globals.generalWaitingTime);
     utility.snapshotInIteration('convert-'+imageDifference+'8.png', browser, i);
     browser.execute(function () {
@@ -187,9 +192,9 @@ function buy(browser, i, isJoinBooking){
     }, []);
 
     browser.waitForElementVisible('#stripe_selenium_cvc', browser.globals.generalWaitingTime);
-    browser.setValue('#stripe_selenium_card', '4242424242424242'); 
+    browser.setValue('#stripe_selenium_card', '4242424242424242');
     browser.setValue('#stripe_selenium_date', '1024');
-    browser.setValue('#stripe_selenium_cvc', '333'); 
+    browser.setValue('#stripe_selenium_cvc', '333');
     browser.click("button[type=submit]");
     browser.frame(null);
     browser.pause(3000);
@@ -212,7 +217,7 @@ function buy(browser, i, isJoinBooking){
 
     });
     browser.pause(20000);
-    
+
 
 }
 
@@ -224,7 +229,7 @@ function doIntroModel(browser){
     browser.click(".introModalContent .btn-primary");
     browser.click(".introModalContent .btn-primary");
     browser.waitForElementNotPresent('.introModalContent', browser.globals.generalWaitingTime);
-    
+
 }
 
 function addConvertFlowCase (i){
@@ -242,9 +247,9 @@ function addConvertFlowCase (i){
 
     browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
     doIntroModel(browser);
-    browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+    browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
     browser.click(".cc-dismiss");
-    browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+    browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
 
     browser.deleteCookies(function() {});//for stripe
     browser.execute(function () {
@@ -256,9 +261,9 @@ function addConvertFlowCase (i){
 
   testCases[utility.testNamePrefix() +'Go to and will scroll through detail view, iteration: ' + i] = function (browser) {
     navigateToBookableTimeslot(browser, i);
-    
+
     //todo new desing   //TODO USE CLICK i
-    browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);   
+    browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);
     if(i  === 1){
      utility.snapshotInIteration('convert-start.png', i);
       browser.execute(function () {
@@ -270,7 +275,7 @@ function addConvertFlowCase (i){
          jQuery(window).scrollTop(jQuery('.deal .ingress').offset().top - (jQuery(window).height() / 2));
       }, []);
       utility.snapshotInIteration('convert-b.png', i);
-      browser.pause(browser.globals.generalScrollTime);   
+      browser.pause(browser.globals.generalScrollTime);
       browser.execute(function () {
          jQuery(window).scrollTop(jQuery('.buy .ticketsTitle').offset().top - (jQuery(window).height() / 2));
       }, []);
@@ -281,8 +286,8 @@ function addConvertFlowCase (i){
       }, []);
       browser.pause(browser.globals.generalScrollTime);
       utility.snapshotInIteration('convert-d.png', i);
-    } 
-   
+    }
+
   };
 
   testCases[utility.testNamePrefix() +'Reload deal page and survives  , iteration: ' + i] = function (browser) {
@@ -292,20 +297,20 @@ function addConvertFlowCase (i){
       browser.perform(function() {
           console.log('Reload deal');
       });
-      
+
       browser.execute(function () {
        window.location.href = window.location.href;
       }, []);
       browser.pause(browser.globals.waitAfterNewUrlTime);
-      browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);   
-      // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+      browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);
+      // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
       // browser.click(".cc-dismiss");
-      // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+      // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
       browser.pause(browser.globals.survivesTime);
       browser.expect.element(".bootstrapBlock.error-msg").to.not.be.present;
-          
+
     }
-    
+
   };
 
   testCases[utility.testNamePrefix() +'Buy ticket, and will scroll trough success page, iteration: ' + i] = function (browser) {
@@ -333,7 +338,7 @@ function addConvertFlowCase (i){
         browser.saveScreenshot('convert-12.png');
     }
 
-    browser.waitForElementVisible('.inviteFriendsBlock', browser.globals.generalWaitingTime);  
+    browser.waitForElementVisible('.inviteFriendsBlock', browser.globals.generalWaitingTime);
     browser.execute(function () {
        jQuery(window).scrollTop(jQuery('.inviteFriendsBlock').offset().top - (jQuery(window).height() / 2));
     }, []);
@@ -345,7 +350,7 @@ function addConvertFlowCase (i){
     });
 
   };
-  
+
   testCases[utility.testNamePrefix() +'Reload, survives and scroll trough join booking url, iteration: ' + i] = function (browser) {
     console.log('reloads join');
     console.log(browser.globals.testSpecific.convertFlow.amountOfJoinBookingUrlReloads);
@@ -356,22 +361,22 @@ function addConvertFlowCase (i){
         });
       browser.url(joinUrl+"?tester=" +browser.globals.testerName);
 
-      browser.pause(browser.globals.waitAfterNewUrlTime); 
+      browser.pause(browser.globals.waitAfterNewUrlTime);
       // browser.getTagName(".cc-dismiss", function(result) {
       //   console.log(result);
       //   if(result.status ===  'success'){
-      //     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+      //     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
       //     browser.click(".cc-dismiss");
       //     browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
       //   }
       // });
 
- 
-      
+
+
       browser.waitForElementVisible(".joinBookingRockstarDetailed", browser.globals.generalWaitingTime);
-      
+
       if(i  === 1 && k === 1){
-        browser.saveScreenshot('convert-join-1.png');   
+        browser.saveScreenshot('convert-join-1.png');
         browser.execute(function () {
           jQuery(window).scrollTop(jQuery('.detailedTopBar').offset().top - (jQuery(window).height() / 2));
         }, []);
@@ -387,38 +392,38 @@ function addConvertFlowCase (i){
         }, []);
         browser.pause(browser.globals.generalScrollTime);
         browser.saveScreenshot('convert-join-4.png');
-        
+
         browser.execute(function () {
           jQuery(window).scrollTop(jQuery('.userEmailWrapper').offset().top - (jQuery(window).height() / 2));
         }, []);
         browser.pause(browser.globals.generalScrollTime);
         browser.saveScreenshot('convert-join-5.png');
-      } 
+      }
       browser.pause(browser.globals.survivesTime);
       browser.perform(function() {
             console.log("Reload join booking survived at nr: " +k);
         });
-      
+
       browser.expect.element(".bootstrapBlock.error-msg").to.not.be.present;
-    }; 
-  
-  };        
+    };
+
+  };
   testCases[utility.testNamePrefix() +'Join event, iteration: ' + i] = function (browser) {
     browser
       .url(joinUrl +"?tester=" +browser.globals.testerName);
-    
 
-    browser.pause(browser.globals.waitAfterNewUrlTime); 
+
+    browser.pause(browser.globals.waitAfterNewUrlTime);
     // browser.getTagName(".cc-dismiss", function(result) {
     //   console.log(result);
     //   if(result.status ===  'success'){
-    //     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);   
+    //     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
     //     browser.click(".cc-dismiss");
     //     browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
     //   }
     // });
 
-    
+
     browser.waitForElementVisible(".joinBookingRockstarDetailed", browser.globals.generalWaitingTime);
     buy(browser, i, true);
     browser.pause(browser.globals.survivesTime);
@@ -427,12 +432,12 @@ function addConvertFlowCase (i){
 
   testCases[utility.testNamePrefix() +'End browser session, iteration: ' + i] = function (browser) {
     browser.end();
-  }      
+  }
 
 }
 
 testCases[utility.testNamePrefix() +'Cancel all bookings'] = function (browser) {
-  amApi.cancelBookings();  
+  amApi.cancelBookings();
 };
 
 
