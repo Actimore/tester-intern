@@ -12,8 +12,12 @@ var childs = {};
 var rerunOnFail = true;
 var rerunOnSuccess = true;
 var readyAfterDeploy = true;
-var limitRerunFailInARow = 1000;
+var limitRerunFailInARow = process.env.LIMIT_RERUN_FAIL_IN_A_ROW || 30;
+var limitRerunSuccessInARow = process.env.LIMIT_RERUN_SUCCESS_IN_A_ROW || 30;
+var limitTotalSinceAction = process.env.LIMIT_TOTAL_SINCE_ACTION || 50;
+var totalSinceAction = 0;
 var failedInARow = 0;
+var successInARow = 0;
 var decoder = new StringDecoder('utf8');
 var watingForRerun = false;
 var testsFailedSinceLastDeploy = 0;
@@ -22,13 +26,14 @@ var db = low('db.json')
 var alternateTests = [];
 var alternateIndex = 0
 var doAlternate = true;
+var isOn = false;
 
-// Set some defaults if your JSON file is empty 
+// Set some defaults if your JSON file is empty
 db.defaults({ paymentUuidsToCancel: [] })
   .write();
- 
 
- 
+
+
 process.title = 'testerInternApp';
 
 function addAlternateReloadableAndSurvives(){
@@ -40,7 +45,7 @@ function addAlternateReloadableAndSurvives(){
 }
 
 function addAlternateConvertFlow(){
-  alternateTests.push("./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js");
+  alternateTests.push(".at the");
   alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js");
   alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_10' --test tests/general/convertFlow.js");
   alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js");
@@ -67,7 +72,7 @@ var S4 = function () {
 function buildForNightwatchConfJs(){
   var prefix = process.env.IS_SERVER ?  'server' : 'local'
 
-  prefix += process.env.IS_REAL ?  'Real' : 'Coding' 
+  prefix += process.env.IS_REAL ?  'Real' : 'Coding'
 
 
   process.env.BS_BUILD = prefix + "BsBuild" +S4()+S4()+S4()+S4();
@@ -85,11 +90,14 @@ function killCmd(pid){
       rest.deleteBrowserStackBuild(name);
       delete childs[pid];
     }, 200000);
-    
+
 }
 
 function allowedToReload(){
-  return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow;
+  return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow && totalSinceAction <= totalSinceAction  && isOn;
+}
+function allowedToReloadOnSuccess(){
+  return readyAfterDeploy && !watingForRerun && successInARow <= limitRerunSuccessInARow && totalSinceAction <= totalSinceAction && isOn;
 }
 
 function logs(error, stdout, stderr, bsBuildName){
@@ -104,19 +112,20 @@ function logs(error, stdout, stderr, bsBuildName){
     fs.writeFile(('./testLogs/success/stdout/' + bsBuildName + '.txt'), decoder.write(stdout), 'utf8', function (err) {
         if (err) return console.log(err);
     });
-  }  
+  }
   if(stderr){
     console.log(stderr);
 
     fs.writeFile(('./testLogs/success/stderr/' + bsBuildName + '.txt'), decoder.write(stderr), 'utf8', function (err) {
         if (err) return console.log(err);
-    });   
+    });
   }
-   
+
 }
 
 function runOnError(cmd){
   failedInARow ++;
+  successInARow = 0;
   amApi.cancelBookings();
   if(rerunOnFail && allowedToReload()){
     if (doAlternate){
@@ -127,13 +136,14 @@ function runOnError(cmd){
       watingForRerun = false;
       console.log('Wiill rerun on fail in a row nr : ' + failedInARow+ ' with cmd: ' +cmd);
       run(cmd);
-    }, 120000); 
+    }, 120000);
   }
 }
 
 function runOnSuccess(cmd){
   failedInARow = 0;
-  if(rerunOnSuccess && allowedToReload()){
+  successInARow++;
+  if(rerunOnSuccess && allowedToReloadOnSuccess()){
     if (doAlternate){
       cmd = getAlternateCmd();
     }
@@ -142,16 +152,17 @@ function runOnSuccess(cmd){
       watingForRerun = false;
       console.log('Wiill rerun on success: ' + cmd);
       run(cmd);
-    }, 120000); 
+    }, 120000);
   }
 }
 
 function run(cmd){
-  var bsBuildName = buildForNightwatchConfJs(); //needs to be set before ecec 
+  totalSinceAction++;
+  var bsBuildName = buildForNightwatchConfJs(); //needs to be set before ecec
   console.log('Build name: ' + bsBuildName);
   console.log(cmd);
   var child = exec(cmd, function(error, stdout, stderr) {
-    delete childs[child.pid];    
+    delete childs[child.pid];
     logs(error, stdout, stderr, bsBuildName);
     if (error) {
       testsFailedSinceLastDeploy++;
@@ -160,11 +171,11 @@ function run(cmd){
       return;
     }
     testsSuccessSinceLastDeploy++;
-    runOnSuccess(cmd); 
+    runOnSuccess(cmd);
   });
 
   childs[child.pid] = {
-    'childObj': child, 
+    'childObj': child,
     'bsBuildName': bsBuildName
   };
 }
@@ -192,50 +203,74 @@ app.get('/ready-after-deploy', function(req, res){
   validateStart(cmd, res);
 });
 
-app.get('/ready-after-deploy-hold-tests', function(req, res){ 
+app.get('/ready-after-deploy-hold-tests', function(req, res){
   testsFailedSinceLastDeploy = 0;
   testsSuccesSinceLastDeploy = 0;
   readyAfterDeploy = true;
 });
 
 app.get('/convert-flow', function(req, res){
+  totalSinceAction = 0;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/convertFlow.js";
+  doAlternate = false;
   validateStart(cmd, res);
 });
 app.get('/convert-flow/win_ie_11', function(req, res){
+  totalSinceAction = 0;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'win_ie_11' --test tests/general/convertFlow.js";
+  doAlternate = false;
   validateStart(cmd, res);
 });
 app.get('/convert-flow/win_ff_52', function(req, res){
+  totalSinceAction = 0;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'win_ff_52' --test tests/general/convertFlow.js";
+  doAlternate = false;
   validateStart(cmd, res);
 });
 app.get('/convert-flow/mac_safari_8', function(req, res){
+  totalSinceAction = 0;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/convertFlow.js";
   validateStart(cmd, res);
 });
 
 
 app.get('/reloadable-and-survives', function(req, res){
+  totalSinceAction = 0;
+  doAlternate = false;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js";
   validateStart(cmd, res);
 });
 
 app.get('/start-page', function(req, res){
+  totalSinceAction = 0;
+  doAlternate = false;
   var cmd = "./node_modules/nightwatch/bin/nightwatch --test tests/general/startPage.js";
   validateStart(cmd, res);
 });
 
-app.get('/alternate/convert-flow', function(req, res){
+app.get('/convert-flow/all-browsers', function(req, res){
+  totalSinceAction = 0;
+  doAlternate = true;
   alternateTests = [];
   addAlternateConvertFlow();
   res.send('ok');
 });
-app.get('/alternate/reloadable-and-survives', function(req, res){
+app.get('/reloadable-and-survives/all-browsers', function(req, res){
+  totalSinceAction = 0;
+  doAlternate = true;
   alternateTests = [];
   addAlternateReloadableAndSurvives();
   res.send('ok');
 });
+app.get('/on', function(req, res){
+  isOn = true;
+  res.send('ok');
+});
+app.get('/off', function(req, res){
+  isOn = false;
+  res.send('ok');
+});
+
 
 app.get('/kill', function(req, res){
   readyAfterDeploy = false;
@@ -246,10 +281,10 @@ app.get('/kill', function(req, res){
   var pids = Object.keys(childs);
   for (var i = 0; i < pids.length; i++) {
     console.log('Will kill pid index ' + i)
-    
+
     killCmd(pids[i]);
   };
-    
+
   res.send('Killed following tests ' + JSON.stringify(pids));
 });
 
@@ -268,16 +303,14 @@ app.get('/did-i-depoy-shitty-code', function(req, res){
 app.get('/status', function(req, res){
   var pids = Object.keys(childs);
   if(pids.length === 0){
-    res.send('No tests are running, and readyAfterDeploy is ' + readyAfterDeploy + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+    res.send('No tests are running, and readyAfterDeploy is ' + readyAfterDeploy + '  and isOn is ' + isOn + '  and watingForRerun is ' + watingForRerun + '  and totalSinceAction is ' + totalSinceAction + ' and limitTotalSinceAction is' +limitTotalSinceAction + '  and successInARow is ' + successInARow +'  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   } else{
-    res.send('Following tests with pid are running, ' + JSON.stringify(pids) + '  and watingForRerun is ' + watingForRerun + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
+    res.send('Following tests with pid are running, ' + JSON.stringify(pids) + '  and isOn is ' + isOn ' and limitTotalSinceAction is' +limitTotalSinceAction +  totalSinceAction + '  and failedInARow is ' + failedInARow + '  and testsFailedSinceLastDeploy is ' + testsFailedSinceLastDeploy + '  and testsSuccessSinceLastDeploy is ' + testsSuccessSinceLastDeploy);
   }
    
 });
 
 app.use(express.static('testLogs'));
-
-addAlternateConvertFlow(); 
 
 var port = process.env.PORT || 3031;
 app.listen(port, function() {

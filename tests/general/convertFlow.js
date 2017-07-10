@@ -15,7 +15,6 @@ var testCases = {},
   cacheWindowAdoption = false,
   cacheWindowMin = 17,
   amountOfDifferentTimeslotsToBuy = 5,
-  seedsMax = 1,
   joinUrl;
 
 if (typeof process.env.paymentUuidsToCancel === 'undefined') {
@@ -31,36 +30,14 @@ for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
 
 
 function navigateToBookableTimeslot(browser, iteration){
-  var seedIndex = 0;
   var dateAttempts = 1;
+  var targetededOverviewIndex = 0; //based on the fact that we book the first date and time in every slot
 
-  function prepareClickableBtnsGte768(){
-    browser.execute(function () {
-      [1, 2, 3, 4, 5].forEach(function(val){
-          jQuery(".filterArea.areaWhen span:nth-of-type("+val+") a").addClass("bd3-"+val+"-forSelenium");
-        });
-    }, []);
-    [1, 2, 3, 4, 5].forEach(function(val){
-        browser.waitForElementPresent('.bd3-'+val+'-forSelenium', browser.globals.generalWaitingTime);
-    });
-  }
-
-  function switchDatesGte768(){
-
-    browser.click(".filterWhen");
-    prepareClickableBtnsGte768();
-    var val = dateAttempts;
-    browser.waitForElementVisible('.bd3-'+val+'-forSelenium', browser.globals.generalWaitingTime);
-    browser.click('.bd3-'+val+'-forSelenium');
-    browser.pause(30000);
-    browser.pause(browser.globals.survivesTime);
-  }
 
   function tryToFindBookableTimeslot(){
-    browser.execute(function (seedIndexInside, seedsMaxInside, dateAttemptsInside) {
+    browser.execute(function (targetededOverviewIndex, dateAttemptsInside) {
 
         var bookableSelector = '.timeSlotOverview.isCanceled-false:not(.participantsNr-0)';
-        var seedBtnSelector = '.actionItems button';
         var scrolled = false;
         var triedToScroll = false;
         // if(dateAttemptsInside === 1){
@@ -68,48 +45,39 @@ function navigateToBookableTimeslot(browser, iteration){
         // }
 
         var amountBookable  = jQuery(bookableSelector).length;
-        var seedBtnExists = jQuery(seedBtnSelector).length ? true: false;
         if(amountBookable){
-          jQuery(bookableSelector).eq(0).addClass('isTargetDetailedViewSelenium');
+          jQuery(bookableSelector).eq(targetededOverviewIndex).addClass('isTargetDetailedViewSelenium');
           return {addedClass: true, switchedSeed: false, scrolled: false, triedToScroll: false};
         } else{
-          if(seedBtnExists && seedIndexInside <= seedsMaxInside){
-            jQuery(seedBtnSelector).click();
-          } else if (seedIndexInside <= seedsMaxInside){
             triedToScroll = true;
             if(jQuery('.timeSlotWrapper').length){
               scrolled = true;
               jQuery(window).scrollTop(jQuery('.timeSlotWrapper').eq(-1).offset().top + jQuery('.timeSlotWrapper').eq(-1).height());
               scrolled = true;
             }
-
-          }
-          return {addedClass: false, switchedSeed: seedBtnExists, scrolled: scrolled, triedToScroll: triedToScroll};
+          return {addedClass: false, scrolled: scrolled, triedToScroll: triedToScroll};
         }
-    }, [seedIndex, seedsMax, dateAttempts], function(result){
+    }, [targetededOverviewIndex, dateAttempts], function(result){
       browser.perform(function() {
+        console.log('Attemt with targetededOverviewIndex:' + targetededOverviewIndex);
         console.log(result);
       });
-      if(result.value.switchedSeed){
-        seedIndex++;
-      }
 
       if(!result.value.addedClass){
           browser.perform(function() {
             console.log("Did not add class");
           });
-        if(seedIndex <= seedsMax && result.value.scrolled){
+        if(result.value.scrolled){
           browser.perform(function() {
-            console.log("Able to scroll and seeds are under max, it is " + seedIndex);
+            console.log("Able to scroll");
           });
         } else {
-          seedIndex = 0;
           browser.pause(500);
           browser.perform(function() {
             console.log("Will switch dates... ");
           });
           if(browser.globals.screenLimits.gte768 && dateAttempts <= 5){
-            switchDatesGte768();
+            console.log("not implemented date and time switch in new design");
           }
           dateAttempts++;
 
@@ -120,6 +88,7 @@ function navigateToBookableTimeslot(browser, iteration){
             console.log("Date attempts allow new attempt... " + 'it is ' +dateAttempts);
           });
           browser.pause(20000);
+          targetededOverviewIndex++;
           tryToFindBookableTimeslot();
         } else {
           browser.perform(function() {
@@ -170,7 +139,7 @@ function buy(browser, i, isJoinBooking){
           $("select[name='timeSlot']").find("option[value='0']").prop('selected',true).trigger('change'); //trigger a change instead of click
       }, []);
       browser.pause(4000);
-    }  
+    }
     browser.click(".buyButton");
 
     browser.waitForElementVisible('.guaranteeModalContent', browser.globals.generalWaitingTime);
@@ -246,7 +215,6 @@ function addConvertFlowCase (i){
     browser.resizeWindow(browser.globals.win.width, browser.globals.win.height);
 
     browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
-    doIntroModel(browser);
     browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
     browser.click(".cc-dismiss");
     browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
