@@ -264,11 +264,12 @@ app.get('/reloadable-and-survives/all-browsers', function(req, res){
 });
 app.get('/on', function(req, res){
   isOn = true;
-  res.send('ok');
+  res.send('is now turned on');
 });
 app.get('/off', function(req, res){
   isOn = false;
-  res.send('ok');
+  amApi.cancelBookings();
+  res.send('Off and canceled bookings');
 });
 
 

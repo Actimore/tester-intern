@@ -21,7 +21,7 @@ if (typeof process.env.paymentUuidsToCancel === 'undefined') {
   process.env.paymentUuidsToCancel = JSON.stringify([]);
 }
 
-for(var i = 1; i<=amountOfDifferentTimeslotsToBuy; i++){
+for(var i = 1; i<=amountOfDifferentTimeslotsToBuy ; i++){
  addConvertFlowCase(i);
 }
 
@@ -37,7 +37,8 @@ function navigateToBookableTimeslot(browser, iteration){
   function tryToFindBookableTimeslot(){
     browser.execute(function (targetededOverviewIndex, dateAttemptsInside) {
 
-        var bookableSelector = '.timeSlotOverview.isCanceled-false:not(.participantsNr-0)';
+        // var bookableSelector = '.timeSlotOverview.isCanceled-false:not(.participantsNr-0)';
+        var bookableSelector = '.timeSlotOverview';
         var scrolled = false;
         var triedToScroll = false;
         // if(dateAttemptsInside === 1){
@@ -220,10 +221,11 @@ function addConvertFlowCase (i){
     browser.resizeWindow(browser.globals.win.width, browser.globals.win.height);
 
     browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
-    // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
-    // browser.click(".cc-dismiss");
-    // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
-
+    browser.waitForElementVisible('.cc-window', browser.globals.generalWaitingTime);
+    browser.execute(function () {
+       jQuery('.cc-window').remove();
+    }, []);
+    browser.pause(5000);
     browser.deleteCookies(function() {});//for stripe
     browser.execute(function () {
        jQuery(window).scrollTop(jQuery('.timeSlotWrapper').eq(1).offset().top - (jQuery(window).height() / 2));
