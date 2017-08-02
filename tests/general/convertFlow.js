@@ -47,6 +47,7 @@ function navigateToBookableTimeslot(browser, iteration){
         var amountBookable  = jQuery(bookableSelector).length;
         if(amountBookable){
           jQuery(bookableSelector).eq(targetededOverviewIndex).addClass('isTargetDetailedViewSelenium');
+
           return {addedClass: true, switchedSeed: false, scrolled: false, triedToScroll: false};
         } else{
             triedToScroll = true;
@@ -130,6 +131,10 @@ function buy(browser, i, isJoinBooking){
     browser.execute(function () {
       jQuery(window).scrollTop(jQuery('.userEmailWrapper').offset().top - (jQuery(window).height() / 2));
     }, []);
+    if (isJoinBooking) {
+      browser.click(".emailChangeWrapper a");
+    }
+    browser.pause(5000); //wait for user name to be preset so can overwride
     browser.setValue('.userEmailWrapper input[type=email]', userTestEmail);
     browser.setValue('input.userName', userTestName);
     browser.pause(browser.globals.generalScrollTime);
@@ -215,9 +220,9 @@ function addConvertFlowCase (i){
     browser.resizeWindow(browser.globals.win.width, browser.globals.win.height);
 
     browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
-    browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
-    browser.click(".cc-dismiss");
-    browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
+    // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
+    // browser.click(".cc-dismiss");
+    // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
 
     browser.deleteCookies(function() {});//for stripe
     browser.execute(function () {

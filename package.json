@@ -14,5 +14,8 @@
     "request": "^2.81.0",
     "sleep": "^5.1.1",
     "string_decoder": "^1.0.0"
+  },
+  "devDependencies": {
+    "js-combinatorics": "^0.5.2"
   }
 }
