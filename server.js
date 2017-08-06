@@ -94,10 +94,10 @@ function killCmd(pid){
 }
 
 function allowedToReload(){
-  return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow && totalSinceAction <= totalSinceAction  && isOn;
+  return readyAfterDeploy && !watingForRerun && failedInARow <= limitRerunFailInARow && totalSinceAction <= limitTotalSinceAction  && isOn;
 }
 function allowedToReloadOnSuccess(){
-  return readyAfterDeploy && !watingForRerun && successInARow <= limitRerunSuccessInARow && totalSinceAction <= totalSinceAction && isOn;
+  return readyAfterDeploy && !watingForRerun && successInARow <= limitRerunSuccessInARow && totalSinceAction <= limitTotalSinceAction && isOn;
 }
 
 function logs(error, stdout, stderr, bsBuildName){
