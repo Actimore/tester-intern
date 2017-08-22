@@ -31,7 +31,7 @@ for(var i = 1; i<=amountOfDifferentTimeslotsToBuy ; i++){
 
 function navigateToBookableTimeslot(browser, iteration){
   var dateAttempts = 1;
-  var targetededOverviewIndex = 0; //based on the fact that we book the first date and time in every slot
+  var targetededOverviewIndex = iteration - 1; //based on the fact that we book the first date and time in every slot
 
 
   function tryToFindBookableTimeslot(){
@@ -85,18 +85,18 @@ function navigateToBookableTimeslot(browser, iteration){
 
         }
 
-        if(dateAttempts <= 5 && browser.globals.screenLimits.gte768){
-          browser.perform(function() {
-            console.log("Date attempts allow new attempt... " + 'it is ' +dateAttempts);
-          });
-          browser.pause(20000);
-          targetededOverviewIndex++;
-          tryToFindBookableTimeslot();
-        } else {
-          browser.perform(function() {
-            console.log("Date attempts to many or lte768, will quit trying finding bookable timeslot... ");
-          });
-        }
+        // if(dateAttempts <= 5 && browser.globals.screenLimits.gte768){
+        //   browser.perform(function() {
+        //     console.log("Date attempts allow new attempt... " + 'it is ' +dateAttempts);
+        //   });
+        //   browser.pause(20000);
+        //   targetededOverviewIndex++;
+        //   tryToFindBookableTimeslot();
+        // } else {
+        //   browser.perform(function() {
+        //     console.log("Date attempts to many or lte768, will quit trying finding bookable timeslot... ");
+        //   });
+        // }
 
       } else {
           browser.perform(function() {
@@ -265,28 +265,28 @@ function addConvertFlowCase (i){
 
   };
 
-  testCases[utility.testNamePrefix() +'Reload deal page and survives  , iteration: ' + i] = function (browser) {
-    console.log('deal realoads');
-    console.log(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads);
-    for(var j = 1; j<=browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads; j++){
-      browser.perform(function() {
-          console.log('Reload deal');
-      });
-
-      browser.execute(function () {
-       window.location.href = window.location.href;
-      }, []);
-      browser.pause(browser.globals.waitAfterNewUrlTime);
-      browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);
-      // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
-      // browser.click(".cc-dismiss");
-      // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
-      browser.pause(browser.globals.survivesTime);
-      browser.expect.element(".bootstrapBlock.error-msg").to.not.be.present;
-
-    }
-
-  };
+  // testCases[utility.testNamePrefix() +'Reload deal page and survives  , iteration: ' + i] = function (browser) {
+  //   console.log('deal realoads');
+  //   console.log(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads);
+  //   for(var j = 1; j<=browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads; j++){
+  //     browser.perform(function() {
+  //         console.log('Reload deal');
+  //     });
+  //
+  //     browser.execute(function () {
+  //      window.location.href = window.location.href;
+  //     }, []);
+  //     browser.pause(browser.globals.waitAfterNewUrlTime);
+  //     browser.waitForElementVisible('.rockstarDetailedWrapper', browser.globals.generalWaitingTime);
+  //     // browser.waitForElementVisible('.cc-dismiss', browser.globals.generalWaitingTime);
+  //     // browser.click(".cc-dismiss");
+  //     // browser.waitForElementNotVisible('.cc-dismiss', browser.globals.generalWaitingTime);
+  //     browser.pause(browser.globals.survivesTime);
+  //     browser.expect.element(".bootstrapBlock.error-msg").to.not.be.present;
+  //
+  //   }
+  //
+  // };
 
   testCases[utility.testNamePrefix() +'Buy ticket, and will scroll trough success page, iteration: ' + i] = function (browser) {
     /*if(browser.globals.testSpecific.convertFlow.amountOfDealUrlreloads !== 0){

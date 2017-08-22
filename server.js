@@ -36,6 +36,12 @@ db.defaults({ paymentUuidsToCancel: [] })
 
 process.title = 'testerInternApp';
 
+function resetRunCounters (){
+  failedInARow  = 0;
+  successInARow = 0;
+  totalSinceAction = 0;
+}
+
 function addAlternateReloadableAndSurvives(){
   alternateTests.push("./node_modules/nightwatch/bin/nightwatch --test tests/general/reloadableAndSurvives.js");
   alternateTests.push("./node_modules/nightwatch/bin/nightwatch --env 'mac_safari_8' --test tests/general/reloadableAndSurvives.js");
@@ -126,10 +132,15 @@ function logs(error, stdout, stderr, bsBuildName){
 function runOnError(cmd){
   failedInARow ++;
   successInARow = 0;
+  console.log('aa');
   amApi.cancelBookings();
   if(rerunOnFail && allowedToReload()){
+    console.log('bb');
     if (doAlternate){
+      console.log('cc');
       cmd = getAlternateCmd();
+      console.log('cmd');
+      console.log(cmd);
     }
     watingForRerun = true;
     setTimeout(function(){
@@ -143,10 +154,15 @@ function runOnError(cmd){
 function runOnSuccess(cmd){
   failedInARow = 0;
   successInARow++;
+  amApi.cancelBookings();
   if(rerunOnSuccess && allowedToReloadOnSuccess()){
+    console.log('allowed sucess');
     if (doAlternate){
+      console.log('alter');
       cmd = getAlternateCmd();
     }
+    console.log('cmd');
+    console.log(cmd);
     watingForRerun = true;
     setTimeout(function(){
       watingForRerun = false;
@@ -164,12 +180,17 @@ function run(cmd){
   var child = exec(cmd, function(error, stdout, stderr) {
     delete childs[child.pid];
     logs(error, stdout, stderr, bsBuildName);
+    console.log('callback rund');
     if (error) {
       testsFailedSinceLastDeploy++;
+      console.log('before mark');
       rest.markSessionsAsFailedByBuildName(bsBuildName, 'CMD_ERROR')
+      console.log('after mark');
       runOnError(cmd);
+      console.log('after on error');
       return;
     }
+    console.log('was success callbacfk');
     testsSuccessSinceLastDeploy++;
     runOnSuccess(cmd);
   });
@@ -264,11 +285,14 @@ app.get('/reloadable-and-survives/all-browsers', function(req, res){
 });
 app.get('/on', function(req, res){
   isOn = true;
-  res.send('is now turned on');
+  amApi.cancelBookings();
+  resetRunCounters();
+  res.send('is now turned on and canceled bookings');
 });
 app.get('/off', function(req, res){
   isOn = false;
   amApi.cancelBookings();
+  resetRunCounters();
   res.send('Off and canceled bookings');
 });
 
