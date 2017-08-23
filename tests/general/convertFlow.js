@@ -44,10 +44,11 @@ function navigateToBookableTimeslot(browser, iteration){
         // if(dateAttemptsInside === 1){
         //   jQuery(bookableSelector).remove(); //Simulates all booked while testing this algoritm
         // }
+        var $viableSlots = jQuery(bookableSelector).not('.deletedOnServer');
 
-        var amountBookable  = jQuery(bookableSelector).length;
+        var amountBookable  = $viableSlots.length;
         if(amountBookable){
-          jQuery(bookableSelector).eq(targetededOverviewIndex).addClass('isTargetDetailedViewSelenium');
+          $viableSlots.eq(targetededOverviewIndex).addClass('isTargetDetailedViewSelenium');
 
           return {addedClass: true, switchedSeed: false, scrolled: false, triedToScroll: false};
         } else{
