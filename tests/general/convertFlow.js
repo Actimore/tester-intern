@@ -219,9 +219,13 @@ function addConvertFlowCase (i){
       browser.pause(msWindow);
     }
 
+
     browser.resizeWindow(browser.globals.win.width, browser.globals.win.height);
 
     browser.url(browser.globals.siteDomain +"?tester=" +browser.globals.testerName);
+
+    browser.pause(80000);
+
     browser.waitForElementVisible('.cc-window', browser.globals.generalWaitingTime);
     browser.execute(function () {
        jQuery('.cc-window').remove();
